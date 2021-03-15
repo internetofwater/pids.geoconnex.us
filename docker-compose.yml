@@ -7,14 +7,12 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASS}"
         restart: always
-        volumes:
-          - my-datavolume:/var/lib/mysql
 
     adminer:
         image: adminer
         restart: always
         ports:
-            - 9080:8080
+            - 8080:8080
 
     yourls:
         build:
@@ -28,7 +26,4 @@ services:
             YOURLS_PRIVATE_API: "false"
         restart: always
         ports:
-            - 9082:80
-
-volumes:
-  my-datavolume:
+            - 8082:80

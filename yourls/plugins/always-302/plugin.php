@@ -14,5 +14,5 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 yourls_add_filter( 'redirect_code', 'tinjaw_302_redirection' );
 
 function tinjaw_302_redirection( $code, $location ) {
-    return 302;
+    return 303;
 }
