@@ -14,7 +14,7 @@ services:
         image: adminer
         restart: always
         ports:
-            - 8080:8080
+            - 9080:8080
 
     yourls:
         build:
@@ -28,7 +28,7 @@ services:
             YOURLS_PRIVATE_API: "true"
         restart: always
         ports:
-            - 8082:80
+            - 9082:80
             
 volumes:
     data_volume:
