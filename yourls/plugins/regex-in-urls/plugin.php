@@ -24,8 +24,9 @@ function try_regex( $args ) {
     $pattern       = '^%$';
     $sql           = "SELECT * FROM `$table` WHERE `keyword` LIKE '$pattern' AND '$sanitized_val' REGEXP `keyword`";
     $sql_result    = $ydb->fetchObject( $sql );
-    $redirect_url  = str_replace("$1", basename($sanitized_val), $sql_result->{"url"});
-
-    yourls_redirect($redirect_url, 302);
-    die();
+    if ($sql_result!==false){
+        $redirect_url  = str_replace("$1", basename($sanitized_val), $sql_result->{"url"});
+        yourls_redirect($redirect_url);
+        die();
+    }
 }
