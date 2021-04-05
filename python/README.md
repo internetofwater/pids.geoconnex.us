@@ -12,18 +12,13 @@ See usage to explore optional arguments.
 ### Installation
 
 1. Clone the repository to your own personal folder and start YOURLS service. <br>
-   ```
-   git clone https://github.com/webb-ben/IoW-YOURLS
-   cd geoconnex.us/simple-yourls<br>
-   docker-compose up -d --build
-   ```
-2. Open yourls admin interface at `http://[HOSTNAME]/admin` and install yourls.
+2. Open yourls admin interface and install yourls.
 3. Enable plugins before adding any entries. 
 4. To populate database (with Docker):
  - From namespaces & namespaces is located in `.` :
    ```
    docker build -t namespaces -f Dockerfile-namespaces .
-   docker run -i -t \
+   docker run -i -t --rm \
     --mount type=bind,source="$(pwd)"/namespaces/,dst=/data/ \
     --network simple-yourls_default \
     namespaces
@@ -31,7 +26,7 @@ See usage to explore optional arguments.
  - From BACKUP & backup_current is located in `.` :
    ```
    docker build -t backup -f Dockerfile-backup .
-   docker run -i -t \
+   docker run -i -t --rm \
     --mount type=bind,source="$(pwd)"/backup_current/,dst=/data/ \
     --network simple-yourls_default \
     backup
@@ -39,10 +34,10 @@ See usage to explore optional arguments.
   - From URL & urls are declared in the CMD list of the Dockerfile:
    ```
    docker build -t url -f Dockerfile-url .
-   docker run -i -t \
+   docker run -i -t --rm \
     --network simple-yourls_default \
     url
-   ``` 
+   ```
 
 #### Usage
 The python files can also be run locally on. <br>
