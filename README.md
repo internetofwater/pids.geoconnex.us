@@ -26,7 +26,7 @@ YOURLS plugins used & activated:
 2. Open yourls admin interface at `http://localhost:8082/admin` and install yourls.
 3. Enable all plugins before adding any entries. 
 4. To populate database:
- - Look under [python](https://github.com/webb-ben/geoconnex.us/tree/master/simple-yourls/python)
+ - Look under [python](python/README.md)
  - Upload a backup of the SQL database using the adminer interface at `http://localhost:8080/`.
 
 #### Login information
