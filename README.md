@@ -16,22 +16,20 @@ YOURLS plugins used & activated:
 - [request-forwarder](https://github.com/webb-ben/plugins/tree/master/request-forward)
 - [bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
 - [bulk-API-import](https://github.com/webb-ben/plugins/tree/main/bulk-api-import)
+- [sleek-backend](https://sleeky.flynntes.com)
+- change-title
 
 ### Installation
 
 1. Clone the repository to your own personal folder. <br>
-   `git clone https://github.com/webb-ben/geoconnex.us`<br>
-   `cd geoconnex.us/simple-yourls`<br>
+   `git clone https://github.com/internetofwater/IoW-YOURLS`<br>
+   `cd IoW-YOURLS`<br>
    `docker-compose up -d --build`
-2. Open yourls admin interface at `http://localhost:8082/admin` and install yourls.
+2. Open yourls admin interface and install yourls.
 3. Enable all plugins before adding any entries. 
 4. To populate database:
  - Look under [python](python/README.md)
- - Upload a backup of the SQL database using the adminer interface at `http://localhost:8080/`.
-
-#### Login information
-- Yourls Interface @ `http://localhost:8082/admin` => User: yourls-admin, Pass: apassword
-- Adminter Interface @ `http://localhost:8080/admin` => User: root, Pass: arootpassword, Server: mysql
+ - Upload a backup of the SQL database using the adminer interface.
 
 ### License
 This service is licensed under the [MIT License](LICENSE).
