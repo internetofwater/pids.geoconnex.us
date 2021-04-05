@@ -31,7 +31,7 @@ See usage to explore optional arguments.
     --network simple-yourls_default \
     backup
    ```
-  - From URL & urls are declared in the CMD list of the Dockerfile:
+ - From URL & urls are declared in the CMD list of the Dockerfile:
    ```
    docker build -t url -f Dockerfile-url .
    docker run -i -t --rm \
