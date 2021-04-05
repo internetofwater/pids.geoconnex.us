@@ -13,7 +13,7 @@ See usage to explore optional arguments.
 
 1. Clone the repository to your own personal folder and start YOURLS service. <br>
    ```
-   git clone https://github.com/webb-ben/geoconnex.us
+   git clone https://github.com/webb-ben/IoW-YOURLS
    cd geoconnex.us/simple-yourls<br>
    docker-compose up -d --build
    ```
@@ -45,9 +45,13 @@ See usage to explore optional arguments.
    ``` 
 
 #### Usage
-The python files can also be run locally on To see argparser defaults & options run:
+The python files can also be run locally on. <br>
+To see argparser options run:
 - `python yourls_client.py -h`
-- `python populate_db.py -h`
+- `python populate_db.py -h` 
+
+Defaults can be found in the make_parser() function.
+
 
 ### License
 This service is licensed under the [MIT License](LICENSE).
