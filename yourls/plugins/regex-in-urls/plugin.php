@@ -12,7 +12,7 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
 yourls_add_filter( 'get_shorturl_charset', 'regex_in_charset' );
 function regex_in_charset( $in ) {
-        return $in.'_[]{}()^*\/-+?|$.';
+    return $in.'_[]{}()^*\/-+?|$.';
 }
 
 yourls_add_action( 'redirect_keyword_not_found', 'try_regex' );
@@ -24,6 +24,7 @@ function try_regex( $args ) {
     $pattern       = '^%$';
     $sql           = "SELECT * FROM `$table` WHERE `keyword` LIKE '$pattern' AND '$sanitized_val' REGEXP `keyword`";
     $sql_result    = $ydb->fetchObject( $sql );
+    
     if ($sql_result!==false){
         $redirect_url  = str_replace("$1", basename($sanitized_val), $sql_result->{"url"});
         yourls_redirect($redirect_url);

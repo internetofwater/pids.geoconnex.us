@@ -1,7 +1,7 @@
 # Regex in Yourls
 
 Retrieves the long URL where the short URL is a regex expression of the requested keyword.
-Require [YOURLS](https://yourls.org) `1.7.9` and above.
+Requires [YOURLS](https://yourls.org) `1.7.9` and above.
 
 ## Usage
 

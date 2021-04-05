@@ -1,7 +1,7 @@
 # Request Forwarder
 
 Forwards the extension from keyword to long URL redirect.
-Require [YOURLS](https://yourls.org) `1.7.9` and above.
+Requires [YOURLS](https://yourls.org) `1.7.9` and above.
 
 ## Usage
 
