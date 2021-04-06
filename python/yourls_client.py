@@ -1,16 +1,31 @@
 # =================================================================
 #
 # Author: Ben Webb
-# File: populate_db.py
+# File: yourls_client.py
 # Date: 4/1/2021
 #
 # =================================================================
 
-import yourls_api
 import os
-import time
-import xml.etree.ElementTree as ET
+import yourls_api
 import argparse
+
+def walk_path(path):
+    """
+    Walks os directory path collecting all CSV files.
+
+    :param path: required, string. os directory.
+    :return: list. List of csv paths.
+    """
+    file_list = []
+    for root, _, files in os.walk(path, topdown=False):
+        for name in files:
+            if name.startswith('example'):
+                continue
+            elif name.endswith('.csv'):
+                file_list.append(os.path.join(root, name))
+
+    return file_list
 
 def make_parser():
     """
@@ -22,13 +37,7 @@ def make_parser():
 
     parser.add_argument('path', type=str, nargs='+',
                         help='path to csv files. accepts directory, url, and .csv paths')
-    parser.add_argument('-s','--sort', dest='sort', action='store_const', const=sorted,
-                        default=sorted,
-                        help='Sort csv files')
-    parser.add_argument('-r','--rev', dest='rev', action='store_const', const=reversed,
-                        default=reversed,
-                        help='Reverse sort files')
-    parser.add_argument('--uri_stem', action='store', dest='uri_stem', type=str,
+    parser.add_argument('-s','--uri_stem', action='store', dest='uri_stem', type=str,
                         default='https://geoconnex.us/',
                         help='uri stem to be removed from short url for keyword')
     parser.add_argument('-k','--keyword', action='store', dest='keyword', type=str,
@@ -55,34 +64,16 @@ def make_parser():
     return parser
 
 def main():
-
     parser = make_parser()
     kwargs = parser.parse_args()
-
-    urls = yourls_api.yourls(**vars(kwargs))
-
-    path = str(*kwargs.path)
-    backup_list = os.listdir(path)
-    backup_list.remove('.DS_Store')
-
-    backup_list = kwargs.sort(backup_list)
-    backup_list = kwargs.rev(backup_list)
-
-    for filename in backup_list:
-        t = time.time()
-        root = ET.parse(path + filename).getroot()
-        entries = {'success': 0, 'preexisting': 0}
-
-        for child in root:
-            long_url = child[4][2].text
-            short_url = child[0].text.replace('/', '', 1)
-            title = child[2].text
-            try:
-                urls.shorten_quick(url=long_url, keyword=short_url, title=title)
-                entries['success'] += 1
-            except yourls_api.exceptions.Pyourls3HTTPError:
-                entries['preexisting'] += 1
-        # print('\r', filename, 'in % .2f seconds :' % (time.time()-t), entries)
+    
+    urls = yourls_api.yourls( **vars(kwargs) )
+    
+    for p in kwargs.path:
+        if p.endswith('.csv'):
+            urls.handle_csv( p )
+        else:
+            urls.handle_csv( walk_path(p) )
 
 if __name__ == "__main__":
     main()
