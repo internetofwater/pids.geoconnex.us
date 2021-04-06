@@ -87,7 +87,7 @@ function import_urls( $file ) {
 
             if ( isset( $csv[1] ) && !empty( $csv[1] ) ) {
                 $keyword = trim( $csv[1] );
-                $keyword = yourls_sanitize_keyword( $keyword, true );
+                $keyword = yourls_sanitize_keyword( $keyword );
             }
 
             if ( isset( $csv[2] ) && !empty( $csv[2] ) ) {
