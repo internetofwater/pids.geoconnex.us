@@ -5,30 +5,31 @@ services:
         build:
             context: ./mysql/
         environment:
-            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+            MYSQL_ROOT_PASSWORD: ${SQL_ROOT_PASS}
         restart: always
+        networks:
+            - yourls_host
         volumes:
          - data_volume:/var/lib/mysql
-
-    adminer:
-        image: adminer
-        restart: always
-        ports:
-            - 9080:8080
 
     yourls:
         build:
             context: ./yourls/
         environment:
-            YOURLS_DB_PASS: ${DB_ROOT_PASS}
-            YOURLS_SITE: ${DB_HOSTNAME}
-            YOURLS_USER: ${DB_USER}
-            YOURLS_PASS: ${DB_PASS}
+            YOURLS_DB_PASS: ${SQL_ROOT_PASS}
+            YOURLS_SITE: ${YOURLS_HOSTNAME}:${YOURLS_PORT}
+            YOURLS_USER: ${YOURLS_USER}
+            YOURLS_PASS: ${YOURLS_PASS}
             YOURLS_URL_CONVERT: 62
             YOURLS_PRIVATE_API: "true"
+            YOURLS_UNIQUE_URLS: "false"
         restart: always
+        networks: 
+            - yourls_host
         ports:
-            - 9082:80
-            
+            - ${YOURLS_PORT}:80
+
+networks:
+    yourls_host:
 volumes:
     data_volume:

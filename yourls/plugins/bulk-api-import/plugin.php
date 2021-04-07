@@ -8,6 +8,8 @@ Author: Ben Webb
 Author URI: http://github.com/Webb-Ben
 */
 
+
+
 // Define custom api action 'quick_shorten'
 yourls_add_filter( 'api_action_shorten_quick', 'quick_shorten' );
 // Quick Shorten
@@ -87,7 +89,7 @@ function import_urls( $file ) {
 
             if ( isset( $csv[1] ) && !empty( $csv[1] ) ) {
                 $keyword = trim( $csv[1] );
-                $keyword = yourls_sanitize_keyword( $keyword );
+                $keyword = yourls_sanitize_keyword( $keyword, true );
             }
 
             if ( isset( $csv[2] ) && !empty( $csv[2] ) ) {
@@ -101,7 +103,7 @@ function import_urls( $file ) {
                     $added++;
                 }
             }
-            else if ( !yourls_url_exists( $url ) ) {
+            else {
                 if (yourls_edit_link( $url, $keyword, $keyword, $title )){
                     $updated++;
                 }
