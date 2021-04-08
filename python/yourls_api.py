@@ -129,7 +129,7 @@ class yourls(Yourls):
         chunky_parsed = self.chunkify( parsed_csv )
 
         for chunk in chunky_parsed:
-            r = self.shorten_csv(file, chunk)       
+            r = self.shorten_csv(file, chunk)      
 
     def parse_csv(self, filename):
         """
@@ -149,22 +149,21 @@ class yourls(Yourls):
             fp = open(filename, mode='r')
 
         csv_reader = csv.reader(fp)
-        headers = next(csv_reader)
-
+        headers = [h.strip() for h in next(csv_reader)]
         ret_csv = []
         for line in csv_reader:
             parsed_line = []
             for k, v in vals.items():
                 try:
-                    parsed_line.append( line[headers.index(v)] )
-                except ValueError:
+                    parsed_line.append( line[headers.index(v)].strip() )
+                except (ValueError, IndexError):
                     continue
             _ = self._check_kwargs(['uri_stem',])
             ret_csv.append((','.join(parsed_line) + '\n').replace(*[v for k, v in _], ''))
 
         if not r:
             fp.close()
-            
+
         return ret_csv
 
     def chunkify(self, input, n=500):
