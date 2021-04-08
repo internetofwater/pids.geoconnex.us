@@ -7,6 +7,9 @@ Version: 1.0
 Author: Ben Webb
 */
 
+// No direct call
+if( !defined( 'YOURLS_ABSPATH' ) ) die();
+
 // Remove extension from keyword during sanitazation
 yourls_add_filter('sanitize_string', 'remove_extension');
 function remove_extension( $keyword ) {
