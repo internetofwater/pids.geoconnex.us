@@ -49,7 +49,7 @@ The basic command is
 
 For example usage:
 
-``` docker run -i -t --rm internetofwater/post-geoconnex python yourls_client.py -s https://geoconnex.us/ -a https://pids.geoconnex.us -u iow -p nieps https://raw.githubusercontent.com/internetofwater/geoconnex.us/iow/namespaces/iow/test.csv```
+``` docker run -i -t --rm internetofwater/post-geoconnex python yourls_client.py -s https://geoconnex.us/ -a https://pids.geoconnex.us -u <user> -p <password> https://raw.githubusercontent.com/internetofwater/geoconnex.us/iow/namespaces/iow/test.csv```
 
 
 ### License
