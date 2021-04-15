@@ -28,6 +28,12 @@ services:
             - yourls_host
         ports:
             - ${YOURLS_PORT}:80
+    
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 6080:8080
 
 networks:
     yourls_host:
