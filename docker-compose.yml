@@ -32,6 +32,8 @@ services:
     adminer:
         image: adminer
         restart: always
+        networks:
+            - yourls_host
         ports:
             - 6080:8080
 
