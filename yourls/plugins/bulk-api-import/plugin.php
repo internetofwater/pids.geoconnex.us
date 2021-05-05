@@ -11,6 +11,33 @@ Author URI: http://github.com/Webb-Ben
 // No direct call
 if( !defined( 'YOURLS_ABSPATH' ) ) die();
 
+// Define custom api action 'quick_shorten'
+yourls_add_filter( 'api_action_shorten_quick', 'quick_shorten' );
+// Quick Shorten
+function quick_shorten() {
+    // Retrieve vals from HTTP request
+	$url = ( isset( $_REQUEST['url'] ) ? $_REQUEST['url'] : '' );
+	$keyword = ( isset( $_REQUEST['keyword'] ) ? $_REQUEST['keyword'] : '' );
+	$title = ( isset( $_REQUEST['title'] ) ? $_REQUEST['title'] : '' );
+
+	if (yourls_insert_link_in_db( $url, $keyword, $title )){
+    // If link added, populate response vals
+        $return['url']      = array('keyword' => $keyword, 'url' => $url, 'title' => $title, 'date' => $timestamp, 'ip' => $ip );
+        $return['status']   = 'success';
+        $return['title']    = $title;
+        $return['shorturl'] = yourls_link($keyword);
+    } 
+    else {
+    // Couldnt store result
+        $return['status']   = 'fail';
+        $return['code']     = 'error:db';
+        $return['message']  = yourls_s( 'Error saving url to database' );
+    }
+
+    // Return response
+	return $return;
+}
+
 // Define custom api action 'csv_shorten'
 yourls_add_filter( 'api_action_shorten_csv', 'csv_shorten' );
 // CSV Shorten
