@@ -13,7 +13,6 @@ function ozh_kqs($url){
 		//$url = yourls_add_query_arg($_GET, $url);
     $url = ozh_kqs_yourls_add_query_arg($_GET, $url);
   }
-  
 	return $url;
 }
 
