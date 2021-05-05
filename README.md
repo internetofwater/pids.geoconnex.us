@@ -7,17 +7,19 @@ YOURLS performs much better at scale ( > 300,000 entries), and allows for the ea
 ### Requires
 - Docker & docker-compose.
 
-YOURLS plugins used & activated:
+Community YOURLS plugins used & activated:
 - [reset-urls](https://gist.github.com/ozh/a0090f46569b50835520d95f9481d9fd#file-plugin-php) 
-- [always-302](https://github.com/tinjaw/Always-302)
+- [always-302](https://github.com/tinjaw/Always-302) (modified to 303)
 - [keep-querystring](https://github.com/rinogo/yourls-keep-query-string)
 - [redirect-index](https://github.com/tomslominski/yourls-redirect-index)
-- [regex-in-urls](https://github.com/webb-ben/plugins/tree/master/regex-in-urls)
 - [request-forwarder](https://github.com/webb-ben/plugins/tree/master/request-forward)
 - [bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
-- [bulk-API-import](https://github.com/webb-ben/plugins/tree/main/bulk-api-import)
-- [sleek-backend](https://sleeky.flynntes.com)
+- [sleeky-backend](https://sleeky.flynntes.com)
 - change-title
+
+YOURLS plugins developed for geoconnex
+- [bulk-API-import](https://github.com/webb-ben/plugins/tree/main/bulk-api-import)
+- [regex-in-urls](https://github.com/webb-ben/plugins/tree/master/regex-in-urls)
 
 ### Installation
 
@@ -27,9 +29,28 @@ YOURLS plugins used & activated:
    `docker-compose up -d --build`
 2. Open yourls admin interface and install yourls.
 3. Enable all plugins before adding any entries. 
-4. To populate database:
- - Look under [python](python/README.md)
- - Upload a backup of the SQL database using the adminer interface.
+
+### Populating database
+Under [python](python/README.md) we have built a [Dockerfile](https://github.com/internetofwater/IoW-YOURLS/blob/main/python/Dockerfile-url)
+that builds a docker image designed to populate a YOURLS database with csv files formatted similarly to the geoconnex contribution format. The image is available on Dockerhub at [internetofwater/post-geoconnex](https://hub.docker.com/repository/docker/internetofwater/post-geoconnex).
+
+The basic command is
+`docker run -i -t --rm internetofwater/post-geoconnex python yourls_client.py --options <path/to/csv>` with the following options
+
+`-s <url>` The stem of the persistent identifiers. In our case, usually `https://geoconnex.us/`
+
+`-a <url>` The url of the PID server management layer. In our case, `https://pids.geoconnex.us`
+
+`-u` The username (same as before)
+
+`-p` The password (same as before)
+
+`<path/to/csv>` can be a local directory with many CSV files, the path of a single CSV file, or the URL of a hosted CSV file.
+
+For example usage:
+
+``` docker run -i -t --rm internetofwater/post-geoconnex python yourls_client.py -s https://geoconnex.us/ -a https://pids.geoconnex.us -u <user> -p <password> https://raw.githubusercontent.com/internetofwater/geoconnex.us/iow/namespaces/iow/test.csv```
+
 
 ### License
 This service is licensed under the [MIT License](LICENSE).
