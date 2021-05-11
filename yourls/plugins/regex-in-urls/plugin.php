@@ -23,13 +23,13 @@ function go_regex(){
 
 yourls_add_action( 'redirect_keyword_not_found', 'try_regex' );
 function try_regex( $args ) {
-    global $ydb;
     $table         = YOURLS_DB_TABLE_URL;
     $keyword       = $args[0];
     $sanitized_val = yourls_sanitize_keyword( $keyword );
     $pattern       = '/%$';
-    $sql           = "SELECT * FROM `$table` WHERE `keyword` LIKE '$pattern' AND '/$sanitized_val' REGEXP `keyword`";
-    $sql_result    = $ydb->fetchObject( $sql );
+    $sql           = "SELECT * FROM `$table` WHERE `keyword` LIKE :pattern AND :sanitized_val REGEXP `keyword`";
+    $binds         = array('pattern' => $pattern, 'sanitized_val' => '/'.$sanitized_val);
+    $sql_result    = yourls_get_db()->fetchObject( $sql, $binds );
     
     if ($sql_result !== false){
         for ($i = 0; $sanitized_val[$i] === $sql_result->{"keyword"}[$i+1]; $i++);
