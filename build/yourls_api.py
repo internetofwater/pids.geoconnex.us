@@ -265,7 +265,7 @@ class yourls(Yourls):
         for f in files:
             tree_ = ET.parse(f)
             name_ = url_join(SITEMAP,f.split('/').pop())
-            tree_.write(name_)
+            tree_.write(f'/{name_}')
             url_ = url_join(uri_stem, name_)
             t = txt.format(url_, datetime.now())
             link_xml = ET.fromstring(t)
