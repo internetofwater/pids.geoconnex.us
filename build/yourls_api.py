@@ -239,7 +239,7 @@ class yourls(Yourls):
         lines = file.split("\n")
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
         uri_stem = self.kwargs.get('uri_stem')
-        txt = "<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n</url>\n"
+        txt = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>"
 
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()[0]
@@ -257,10 +257,10 @@ class yourls(Yourls):
         if not os.path.isdir(SITEMAP):
             os.makedirs(SITEMAP)
 
-        tree = ET.parse('./sitemap-url.xml')
+        tree = ET.parse('./sitemap-schema.xml')
         sitemap = tree.getroot()[0]
         uri_stem = self.kwargs.get('uri_stem')
-        txt = "<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n</url>\n"
+        txt = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>"
         for f in files:
             tree_ = ET.parse(f)
             name_ = url_join(SITEMAP,f.split('/').pop())
