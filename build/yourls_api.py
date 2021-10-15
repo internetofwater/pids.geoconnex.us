@@ -36,6 +36,11 @@ import json
 import xml.etree.ElementTree as ET
 
 SITEMAP = '/sitemap/'
+URI_STEM = os.environ.get('URI_STEM', 'https://geoconnex.us')
+SITEMAP = '<?xml version="1.0" encoding="utf-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</sitemapindex>'
+SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>"
+URLSET = '<?xml version="1.0" encoding="utf-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</urlset>'
+URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>"
 
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
 mydb = mysql.connector.connect(
@@ -191,6 +196,7 @@ class yourls(Yourls):
         if not filename:
             raise exceptions.Pyourls3ParamError('filename')
 
+        # Clean input for inserting
         extra = [datetime.now().date(),'0.0.0.0', 0]
         file = csv_ if csv_ else open(filename, 'r')
         lines = file.split("\n")
@@ -200,22 +206,19 @@ class yourls(Yourls):
                 line[2] = ','.join(line[2:])
                 while len(line) > 3:
                     line.pop(-1)
-
             if len(line) == 3:
                 line.extend(extra)
 
-        sql_statement = ("INSERT INTO yourls_url "
-                    "(`keyword`, `url`, `title`, `timestamp`, `ip`, `clicks`)"
-                    "VALUES (%s, %s, %s, %s, %s, %s)")
-
+        # Commit file to database
+        SQL_STATEMENT = ("INSERT INTO yourls_url "
+                "(`keyword`, `url`, `title`, `timestamp`, `ip`, `clicks`)"
+                "VALUES (%s, %s, %s, %s, %s, %s)")
         mydb, cursor = connection()
         try:
-            cursor.executemany(sql_statement, split_)
+            cursor.executemany(SQL_STATEMENT, split_)
         except mysql.connector.errors.ProgrammingError:
-            for l in split_:
-                if len(l) != 6:
-                    print(l)
-
+            [print(l) if l != 6 else None for l in split_]
+                    
         mydb.commit()
         print(cursor.rowcount, "was inserted.")
         cursor.close()
@@ -238,35 +241,40 @@ class yourls(Yourls):
         file = csv_ if csv_ else open(filename.split('_')[0], 'r')
         lines = file.split("\n")
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
-        uri_stem = self.kwargs.get('uri_stem')
-        txt = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>"
 
-        tree = ET.parse('./sitemap-url.xml')
+        # Build sitemaps for each csv file
+        tree = ET.fromstring(URLSET)
         sitemap = tree.getroot()
-        for i in range(len(split_)):
-            name_ = split_[i]
-            if not name_.startswith('/'):
-                url_ = url_join(uri_stem, name_)
-                t = txt.format(url_, datetime.now())
+        for line in split_:
+            if not line.startswith('/'):
+                url_ = url_join(URI_STEM, line)
+                t = URLSET_FOREACH.format(url_, datetime.now())
                 link_xml = ET.fromstring(t)
                 sitemap.append(link_xml)
+
+        # Write sitemap.xml
         tree.write(f'{filename}.xml')
 
     def make_sitemap(self, files):
         # Setup file system:
-        if not os.path.isdir(SITEMAP):
-            os.makedirs(SITEMAP)
+        if not os.path.isdir('/sitemap/'):
+            os.makedirs('/sitemap/')
 
-        tree = ET.parse('./sitemap-schema.xml')
+        tree = ET.fromstring(SITEMAP)
         sitemap = tree.getroot()
-        uri_stem = self.kwargs.get('uri_stem')
-        txt = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>"
         for f in files:
+            # Make sure file is sitemap
+            format_ = f[:-4].split('__').pop()
+            try:
+                int(format_)
+            except ValueError:
+                continue
+
             tree_ = ET.parse(f)
-            name_ = url_join(SITEMAP,f.split('/').pop())
-            tree_.write(f'/{name_}')
-            url_ = url_join(uri_stem, name_)
-            t = txt.format(url_, datetime.now())
+            name_ = f"/sitemap/{f.split('/').pop()}"
+            tree_.write(name_)
+            url_ = url_join(URI_STEM, name_)
+            t = SITEMAP_FOREACH.format(url_, datetime.now())
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
         tree.write('/sitemap/_sitemap.xml')
