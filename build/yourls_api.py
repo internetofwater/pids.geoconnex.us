@@ -52,8 +52,7 @@ class yourls(Yourls):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.__to_db = True
-        _ = self._check_kwargs(('addr', 'user', 'passwd', 'key'))
-        Yourls.__init__(self, *[v for k, v in _])
+
         if self.__to_db:
             mydb = mysql.connector.connect(
                 host=os.environ.get('YOURLS_HOST', 'mysql'),
@@ -68,6 +67,9 @@ class yourls(Yourls):
             print(cursor.rowcount, "was deleted.")
             cursor.close()
             mydb.close()
+        else:
+            _ = self._check_kwargs(('addr', 'user', 'passwd', 'key'))
+            Yourls.__init__(self, *[v for k, v in _])
 
     def _check_kwargs(self, keys):
         """
@@ -227,7 +229,7 @@ class yourls(Yourls):
 
         parsed_csv = self.parse_csv(file)
         if self.__to_db:
-            chunky_parsed = self.chunkify( parsed_csv, 1000)
+            chunky_parsed = self.chunkify( parsed_csv, 10000)
             for chunk in chunky_parsed:
                 r = self.post_mysql(file, chunk)
         else:
