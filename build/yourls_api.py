@@ -259,7 +259,6 @@ class yourls(Yourls):
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
         tree.write('/sitemap/_sitemap.xml')
-        print(os.listdir('/sitemap'))
 
     def _handle_csvs(self, files):
         """
