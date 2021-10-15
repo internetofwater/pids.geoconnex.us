@@ -10,14 +10,14 @@ jobs:
         uses: actions/checkout@v2
       - name: Install and run Yourls environ
         run: |
-          docker-compose up -d --buil
+          docker-compose up -d --build
       - name: build
         run: |
-          docker build -t build_yourls .
-          docker run --rm --network=yourls_host -e "YOURLS_PORT=${YOURLS_PORT}" -e "YOURLS_DB_PASS=${SQL_ROOT_PASS}" build_yourls
+          docker build -t build_yourls ./build/
+          docker run --rm --network=pidsgeoconnexus_yourls_host -e "YOURLS_PORT=${YOURLS_PORT}" -e "YOURLS_DB_PASS=${SQL_ROOT_PASS}" build_yourls
       - name: Pull SQL
         run: |
-          docker exec -it pids_mysql_1 sh -c "mysqldump -u [user] -p [db_name] | gzip > /yourls.sql.gz"
+          docker exec -it pidsgeoconnexus_mysql_1 sh -c "mysqldump -u [user] -p [db_name] | gzip > /yourls.sql.gz"
       - name: Post SQL
         uses: actions/upload-artifact@v2
         with:
