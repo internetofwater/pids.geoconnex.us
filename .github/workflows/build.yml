@@ -17,9 +17,11 @@ jobs:
           docker run --rm --network=pidsgeoconnexus_yourls_host -e "YOURLS_PORT=${YOURLS_PORT}" -e "YOURLS_DB_PASS=${SQL_ROOT_PASS}" build_yourls
       - name: Pull SQL
         run: |
-          docker exec -it pidsgeoconnexus_mysql_1 sh -c "mysqldump -u [user] -p [db_name] | gzip > /yourls.sql.gz"
+          export MYSQL_PWD=${SQL_ROOT_PASS}
+          docker exec pidsgeoconnexus_mysql_1 sh -c "mysqldump yourls | gzip > /yourls.sql.gz"
+          docker cp pidsgeoconnexus_mysql_1:/yourls.sql.gz ./mysql/yourls.sql.gz
       - name: Post SQL
         uses: actions/upload-artifact@v2
         with:
           name: sql-backup
-          path: /yourls.sql.gz
+          path: ./mysql/yourls.sql.gz

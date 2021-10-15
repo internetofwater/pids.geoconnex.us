@@ -6,7 +6,7 @@ ADD https://github.com/webb-ben/geoconnex.us/archive/refs/heads/dev.zip /dev.zip
 RUN apt-get update \
     && apt-get install unzip \
     # && unzip ./master.zip \
-    && unzip /dev.zip
+    && unzip -qq /dev.zip
 
 FROM python
 
