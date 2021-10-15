@@ -256,7 +256,6 @@ class yourls(Yourls):
         # Setup file system:
         if not os.path.isdir(SITEMAP):
             os.makedirs(SITEMAP)
-        print(files)
 
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()[0]
