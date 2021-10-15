@@ -10,6 +10,7 @@ services:
         networks:
             - yourls_host
         volumes:
+         - ./mysql/yourls-schema.sql.gz:/docker-entrypoint-initdb.d/yourls.sql.gz
          - data_volume:/var/lib/mysql
 
     yourls:
@@ -28,6 +29,18 @@ services:
             - yourls_host
         ports:
             - ${YOURLS_PORT}:80
+
+    # python:
+    #     build:
+    #         context: ./build/
+    #     depends_on:
+    #         - yourls
+    #         - mysql
+    #     environment:
+    #         YOURLS_PORT: ${YOURLS_PORT}
+    #         YOURLS_DB_PASS: ${SQL_ROOT_PASS}
+    #     networks: 
+    #         - yourls_host
     
     adminer:
         image: adminer
