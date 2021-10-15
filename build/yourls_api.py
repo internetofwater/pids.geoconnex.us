@@ -51,6 +51,18 @@ def connection():
     db = mysql.connector.connect(pool_name = 'yourls_loader')
     return (db, db.cursor())
 
+def url_join(*parts):
+    """
+    helper function to join a URL from a number of parts/fragments.
+    Implemented because urllib.parse.urljoin strips subpaths from
+    host urls if they are specified
+    Per https://github.com/geopython/pygeoapi/issues/695
+    :param parts: list of parts to join
+    :returns: str of resulting URL
+    """
+
+    return '/'.join([p.strip().strip('/') for p in parts])
+
 class yourls(Yourls):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -228,15 +240,15 @@ class yourls(Yourls):
         lines = file.split("\n")
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
         uri_stem = self.kwargs.get('uri_stem')
-        txt = "<url>\n\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod></url>"
+        txt = "<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n</url>\n"
 
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()[0]
         for i in range(len(split_)):
             _url = split_[i]
             if not _url.startswith('/'):
-                __url = uri_stem + _url
-                t = txt.format(__url, datetime.now())
+                name_ = url_join(uri_stem, _url)
+                t = txt.format(name_, datetime.now())
                 link_xml = ET.fromstring(t)
                 sitemap.append(link_xml)
         tree.write(f'{filename}.xml')
@@ -250,11 +262,12 @@ class yourls(Yourls):
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()[0]
         uri_stem = self.kwargs.get('uri_stem')
-        txt = "<url>\n\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod></url>"
+        txt = "<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n</url>\n"
         for f in files:
             tree_ = ET.parse(f)
-            tree_.write(f"{SITEMAP}{f.split('/').pop()}")
-            url_ = f'{uri_stem}{f[2:]}'
+            name_ = url_join(SITEMAP,f.split('/').pop())
+            tree_.write(name_)
+            url_ = url_join(uri_stem,name_)
             t = txt.format(url_, datetime.now())
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
