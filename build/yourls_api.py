@@ -242,7 +242,7 @@ class yourls(Yourls):
         txt = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>"
 
         tree = ET.parse('./sitemap-url.xml')
-        sitemap = tree.getroot()[0]
+        sitemap = tree.getroot()
         for i in range(len(split_)):
             name_ = split_[i]
             if not name_.startswith('/'):
@@ -258,7 +258,7 @@ class yourls(Yourls):
             os.makedirs(SITEMAP)
 
         tree = ET.parse('./sitemap-schema.xml')
-        sitemap = tree.getroot()[0]
+        sitemap = tree.getroot()
         uri_stem = self.kwargs.get('uri_stem')
         txt = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>"
         for f in files:
