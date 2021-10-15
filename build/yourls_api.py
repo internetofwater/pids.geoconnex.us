@@ -241,7 +241,7 @@ class yourls(Yourls):
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
         # Build sitemaps for each csv file
-        tree = ET.fromstring('./sitemap-url.xml')
+        tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()
         for line in split_:
             if not line.startswith('/'):
@@ -258,7 +258,7 @@ class yourls(Yourls):
         if not os.path.isdir('/sitemap/'):
             os.makedirs('/sitemap/')
 
-        tree = ET.fromstring('./sitemap-schema.xml')
+        tree = ET.parse('./sitemap-schema.xml')
         sitemap = tree.getroot()
         for f in files:
             # Make sure file is sitemap
