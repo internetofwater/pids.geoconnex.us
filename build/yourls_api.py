@@ -60,7 +60,6 @@ def url_join(*parts):
     :param parts: list of parts to join
     :returns: str of resulting URL
     """
-
     return '/'.join([p.strip().strip('/') for p in parts])
 
 class yourls(Yourls):
@@ -245,10 +244,10 @@ class yourls(Yourls):
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()[0]
         for i in range(len(split_)):
-            _url = split_[i]
-            if not _url.startswith('/'):
-                name_ = url_join(uri_stem, _url)
-                t = txt.format(name_, datetime.now())
+            name_ = split_[i]
+            if not name_.startswith('/'):
+                url_ = url_join(uri_stem, name_)
+                t = txt.format(url_, datetime.now())
                 link_xml = ET.fromstring(t)
                 sitemap.append(link_xml)
         tree.write(f'{filename}.xml')
@@ -267,11 +266,13 @@ class yourls(Yourls):
             tree_ = ET.parse(f)
             name_ = url_join(SITEMAP,f.split('/').pop())
             tree_.write(name_)
-            url_ = url_join(uri_stem,name_)
+            url_ = url_join(uri_stem, name_)
             t = txt.format(url_, datetime.now())
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
         tree.write('/sitemap/_sitemap.xml')
+        print('finished task')
+        exit(-1)
 
     def _handle_csvs(self, files):
         """
