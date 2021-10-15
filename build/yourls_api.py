@@ -272,7 +272,6 @@ class yourls(Yourls):
             sitemap.append(link_xml)
         tree.write('/sitemap/_sitemap.xml')
         print('finished task')
-        exit(-1)
 
     def _handle_csvs(self, files):
         """
