@@ -32,7 +32,10 @@ import yourls_api
 import time
 import argparse
 
-def walk_path(path):
+CSV = 'csv'
+XML = 'xml'
+
+def walk_path(path, t=CSV):
     """
     Walks os directory path collecting all CSV files.
 
@@ -44,7 +47,7 @@ def walk_path(path):
         for name in files:
             if name.startswith('example'):
                 continue
-            elif name.endswith('.csv'):
+            elif name.endswith(t):
                 file_list.append(os.path.join(root, name))
 
     return file_list
@@ -95,7 +98,8 @@ def main():
         if p.endswith('.csv'):
             urls.handle_csv( p )
         else:
-            urls.handle_csv( walk_path(p) )
+            urls.handle_csv(walk_path(p))
+            urls.make_sitemap(walk_path(p,t=XML))
 
 if __name__ == "__main__":
     main()

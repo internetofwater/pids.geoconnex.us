@@ -22,4 +22,4 @@ COPY --from=ZIP /geoconnex.us-dev/namespaces/ /build/namespaces/
 
 
 WORKDIR /build
-CMD [ "python", "yourls_client.py", "--addr", "http://host.docker.internal:8082", "./namespaces/"]
+CMD [ "python", "yourls_client.py", "--addr", "http://host.docker.internal:8082", "/build/namespaces/"]

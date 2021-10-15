@@ -33,6 +33,9 @@ from datetime import date, datetime, timedelta
 import os
 import csv
 import json
+import xml.etree.ElementTree as ET
+
+SITEMAP = '/sitemap/'
 
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
 mydb = mysql.connector.connect(
@@ -51,7 +54,7 @@ def connection():
 class yourls(Yourls):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
-        self.__to_db = True
+        self.__to_db = kwargs.get('_via_yourls_', True)
 
         if self.__to_db:
             mydb = mysql.connector.connect(
@@ -207,6 +210,56 @@ class yourls(Yourls):
         cursor.close()
         mydb.close()
 
+    def _make_sitemap(self, filename, csv_ = ''):
+        """
+        Create sitmap.xml from csv file.
+
+        :param filename: required, string. Name of CSV to be shortened.
+        :param csv_: optional, list. Pre-parsed csv as list of strings.
+        :return: None.
+
+        :raises: pyourls3.exceptions.Pyourls3ParamError, pyourls3.exceptions.Pyourls3HTTPError,
+          pyourls3.exceptions.Pyourls3APIError
+        """
+        if not filename:
+            raise exceptions.Pyourls3ParamError('filename')
+
+        file = csv_ if csv_ else open(filename.split('_')[0], 'r')
+        lines = file.split("\n")
+        split_ = [line.split(',').pop(0) for line in lines[:-1]]
+        uri_stem = self.kwargs.get('uri_stem')
+        txt = "<url>\n\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod></url>"
+
+        tree = ET.parse('./sitemap-url.xml')
+        sitemap = tree.getroot()[0]
+        for i in range(len(split_)):
+            _url = split_[i]
+            if not _url.startswith('/'):
+                __url = uri_stem + _url
+                t = txt.format(__url, datetime.now())
+                link_xml = ET.fromstring(t)
+                sitemap.append(link_xml)
+        tree.write(f'{filename}.xml')
+
+    def make_sitemap(self, files):
+        # Setup file system:
+        if not os.path.isdir(SITEMAP):
+            os.makedirs(SITEMAP)
+        print(files)
+
+        tree = ET.parse('./sitemap-url.xml')
+        sitemap = tree.getroot()[0]
+        uri_stem = self.kwargs.get('uri_stem')
+        txt = "<url>\n\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod></url>"
+        for f in files:
+            tree_ = ET.parse(f)
+            tree_.write(f"{SITEMAP}{f.split('/').pop()}")
+            url_ = f'{uri_stem}{f[2:]}'
+            t = txt.format(url_, datetime.now())
+            link_xml = ET.fromstring(t)
+            sitemap.append(link_xml)
+        tree.write('/sitemap/_sitemap.xml')
+        print(os.listdir('/sitemap'))
 
     def _handle_csvs(self, files):
         """
@@ -231,13 +284,17 @@ class yourls(Yourls):
         if self.__to_db:
             chunky_parsed = self.chunkify( parsed_csv, 10000)
             for chunk in chunky_parsed:
-                r = self.post_mysql(file, chunk)
+                self.post_mysql(file, chunk)
         else:
             chunky_parsed = self.chunkify( parsed_csv )
 
             for chunk in chunky_parsed:
-                r = self.shorten_csv(file, chunk)
-
+                self.shorten_csv(file, chunk)
+        
+        chunky_parsed = self.chunkify( parsed_csv, 50000)
+        for i, chunk in enumerate(chunky_parsed):
+            self._make_sitemap(f'{file[:-4]}__{i}', chunk)
+    
     def parse_csv(self, filename):
         """
         Parse CSV file into yourls-friendly csv.
