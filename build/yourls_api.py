@@ -37,9 +37,7 @@ import xml.etree.ElementTree as ET
 
 SITEMAP = '/sitemap/'
 URI_STEM = os.environ.get('URI_STEM', 'https://geoconnex.us')
-SITEMAP = '<?xml version="1.0" encoding="utf-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</sitemapindex>'
 SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>"
-URLSET = '<?xml version="1.0" encoding="utf-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</urlset>'
 URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>"
 
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
@@ -243,7 +241,7 @@ class yourls(Yourls):
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
         # Build sitemaps for each csv file
-        tree = ET.fromstring(URLSET)
+        tree = ET.fromstring('./sitemap-url.xml')
         sitemap = tree.getroot()
         for line in split_:
             if not line.startswith('/'):
@@ -260,7 +258,7 @@ class yourls(Yourls):
         if not os.path.isdir('/sitemap/'):
             os.makedirs('/sitemap/')
 
-        tree = ET.fromstring(SITEMAP)
+        tree = ET.fromstring('./sitemap-schema.xml')
         sitemap = tree.getroot()
         for f in files:
             # Make sure file is sitemap
