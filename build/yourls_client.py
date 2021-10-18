@@ -1,16 +1,41 @@
 # =================================================================
 #
-# Author: Ben Webb
-# File: yourls_client.py
-# Date: 4/1/2021
+# Authors: Benjamin Webb <benjamin.miller.webb@gmail.com>
+#
+# Copyright (c) 2021 Benjamin Webb
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
 #
 # =================================================================
 
 import os
 import yourls_api
+import time
 import argparse
 
-def walk_path(path):
+CSV = 'csv'
+XML = 'xml'
+
+def walk_path(path, t=CSV):
     """
     Walks os directory path collecting all CSV files.
 
@@ -22,7 +47,7 @@ def walk_path(path):
         for name in files:
             if name.startswith('example'):
                 continue
-            elif name.endswith('.csv'):
+            elif name.endswith(t):
                 file_list.append(os.path.join(root, name))
 
     return file_list
@@ -66,14 +91,15 @@ def make_parser():
 def main():
     parser = make_parser()
     kwargs = parser.parse_args()
-    
+
     urls = yourls_api.yourls( **vars(kwargs) )
-    
+    time.sleep(10)
     for p in kwargs.path:
         if p.endswith('.csv'):
             urls.handle_csv( p )
         else:
-            urls.handle_csv( walk_path(p) )
+            urls.handle_csv(walk_path(p))
+            urls.make_sitemap(walk_path(p,t=XML))
 
 if __name__ == "__main__":
     main()
