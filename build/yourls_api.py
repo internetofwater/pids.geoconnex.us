@@ -242,15 +242,11 @@ class yourls(Yourls):
         lines = file.split("\n")
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
-        # Return on regex
-        if len(split_) <= 2:
-            return
-
         # Build sitemaps for each csv file
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()
         for line in split_:
-            if line.startswith('/'):
+            if '$' in line:
                 return
 
             time_ = self._get_filetime(fname_)
