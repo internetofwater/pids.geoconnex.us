@@ -34,11 +34,12 @@ import os
 import csv
 import json
 import xml.etree.ElementTree as ET
+from shutil import copyfile
 
 SITEMAP = '/sitemap/'
 URI_STEM = os.environ.get('URI_STEM', 'https://geoconnex.us')
-SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>"
-URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>"
+SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>\n"
+URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>\n"
 
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
 mydb = mysql.connector.connect(
@@ -240,24 +241,23 @@ class yourls(Yourls):
         lines = file.split("\n")
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
+        # Return on regex
+        if len(split_) <= 2:
+            return
+
         # Build sitemaps for each csv file
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()
         for line in split_:
-            if not line.startswith('/'):
-                url_ = url_join(URI_STEM, line)
-                t = URLSET_FOREACH.format(url_, datetime.now())
-                link_xml = ET.fromstring(t)
-                sitemap.append(link_xml)
+            url_ = url_join(URI_STEM, line)
+            t = URLSET_FOREACH.format(url_, datetime.now())
+            link_xml = ET.fromstring(t)
+            sitemap.append(link_xml)
 
         # Write sitemap.xml
         tree.write(f'{filename}.xml')
 
     def make_sitemap(self, files):
-        # Setup file system:
-        if not os.path.isdir('/sitemap/'):
-            os.makedirs('/sitemap/')
-
         tree = ET.parse('./sitemap-schema.xml')
         sitemap = tree.getroot()
         for f in files:
@@ -268,13 +268,27 @@ class yourls(Yourls):
             except ValueError:
                 continue
 
-            tree_ = ET.parse(f)
-            name_ = f"/sitemap/{f.split('/').pop()}"
-            tree_.write(name_)
-            url_ = url_join(URI_STEM, name_)
-            t = SITEMAP_FOREACH.format(url_, datetime.now())
+            # Check buildpath
+            _ = f.split('/')
+            name_ = _.pop()
+            parent = '/'.join(_[_.index('namespaces'):])
+            path_ = f'/sitemap/{parent}'
+            if not os.path.exists(path_):
+                os.makedirs(path_)
+
+            # Copy xml to /sitemaps
+            fpath_ = f'{path_}/{name_}'
+            copyfile(f, fpath_)
+
+            # create to link /sitemap/_sitemap.xml
+            _ = os.path.getmtime(fpath_)
+            time_ = datetime.datetime.fromtimestamp(_)
+            url_ = url_join(URI_STEM, fpath_)
+            t = SITEMAP_FOREACH.format(url_, time_)
+
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
+
         tree.write('/sitemap/_sitemap.xml')
         print('finished task')
 
