@@ -29,7 +29,7 @@
 
 from pyourls3.client import *
 import mysql.connector
-from datetime import date, datetime, timedelta
+from datetime import datetime as dt
 import os
 import csv
 import json
@@ -196,7 +196,8 @@ class yourls(Yourls):
             raise exceptions.Pyourls3ParamError('filename')
 
         # Clean input for inserting
-        extra = [datetime.now().date(),'0.0.0.0', 0]
+        time_ = self._get_filetime(filename)
+        extra = [time_,'0.0.0.0', 0]
         file = csv_ if csv_ else open(filename, 'r')
         lines = file.split("\n")
         split_ = [line.split(',') for line in lines[:-1]]
@@ -219,7 +220,7 @@ class yourls(Yourls):
             [print(l) if l != 6 else None for l in split_]
                     
         mydb.commit()
-        print(cursor.rowcount, "was inserted.")
+        # print(cursor.rowcount, "was inserted.")
         cursor.close()
         mydb.close()
 
@@ -236,8 +237,8 @@ class yourls(Yourls):
         """
         if not filename:
             raise exceptions.Pyourls3ParamError('filename')
-
-        file = csv_ if csv_ else open(filename.split('_')[0], 'r')
+        fname_ = filename.split('_')[0]
+        file = csv_ if csv_ else open(fname_, 'r')
         lines = file.split("\n")
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
@@ -249,8 +250,9 @@ class yourls(Yourls):
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()
         for line in split_:
+            time_ = self._get_filetime(fname_)
             url_ = url_join(URI_STEM, line)
-            t = URLSET_FOREACH.format(url_, datetime.now())
+            t = URLSET_FOREACH.format(url_, time_)
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
 
@@ -281,8 +283,7 @@ class yourls(Yourls):
             copyfile(f, fpath_)
 
             # create to link /sitemap/_sitemap.xml
-            _ = os.path.getmtime(fpath_)
-            time_ = datetime.datetime.fromtimestamp(_)
+            time_ = self._get_filetime(fpath_)
             url_ = url_join(URI_STEM, fpath_)
             t = SITEMAP_FOREACH.format(url_, time_)
 
@@ -291,6 +292,14 @@ class yourls(Yourls):
 
         tree.write('/sitemap/_sitemap.xml')
         print('finished task')
+
+    def _get_filetime(self, fpath_):
+        try:
+            _ = os.path.getmtime(fpath_)
+            time_ = dt.fromtimestamp(_)
+        except OSError:
+            time_ = dt.now()
+        return time_
 
     def _handle_csvs(self, files):
         """
