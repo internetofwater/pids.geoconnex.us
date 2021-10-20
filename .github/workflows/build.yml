@@ -45,6 +45,22 @@ jobs:
           cp -R /sitemap sitemap
           docker compose down
 
+      - name: Build and push geoconnex-mysql
+        id: docker_build_mysql
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: webbben/pids-geoconnex-mysql:latest
+          context: mysql
+
+      - name: Build and push geoconnex-yourls
+        id: docker_build_yourls
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: webbben/pids-geoconnex-yourls:latest
+          context: yourls
+
       - name: Push sitemap to geoconnex.us
         uses: dmnemec/copy_file_to_another_repo_action@main
         env:
@@ -66,19 +82,3 @@ jobs:
           destination_branch: 'dev'
           user_email: 'benjamin.miller.webb@gmail.com'
           user_name: 'webb-ben'
-
-      - name: Build and push geoconnex-mysql
-        id: docker_build_mysql
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: webbben/pids-geoconnex-mysql:latest
-          context: mysql
-
-      - name: Build and push geoconnex-yourls
-        id: docker_build_yourls
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: webbben/pids-geoconnex-yourls:latest
-          context: yourls

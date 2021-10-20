@@ -250,6 +250,9 @@ class yourls(Yourls):
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()
         for line in split_:
+            if line.startswith('/'):
+                return
+
             time_ = self._get_filetime(fname_)
             url_ = url_join(URI_STEM, line)
             t = URLSET_FOREACH.format(url_, time_)
@@ -273,7 +276,7 @@ class yourls(Yourls):
             # Check buildpath
             _ = f.split('/')
             name_ = _.pop()
-            parent = '/'.join(_[_.index('namespaces'):])
+            parent = '/'.join(_[_.index('namespaces')+1:])
             path_ = f'/sitemap/{parent}'
             if not os.path.exists(path_):
                 os.makedirs(path_)
