@@ -81,4 +81,4 @@ jobs:
         with:
           push: true
           tags: webbben/pids-geoconnex-yourls:latest
-          context: yourl
+          context: yourls
