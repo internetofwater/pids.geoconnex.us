@@ -1,5 +1,7 @@
 FROM python
 
+ENV YOURLS_DB_PASS=${YOURLS_DB_PASS}
+
 RUN mkdir /build
 COPY . /build/
 
