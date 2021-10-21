@@ -36,8 +36,10 @@ jobs:
           docker build -t build_yourls_uploader ./build/
 
       - name: Fill Yourls table with data from namespaces
+        env:
+          YOURLS_DB_PASS: ${{ secrets.YOURLS_DB_PASS }}
         run: |
-          docker run --rm --network=pids_yourls_host --name build_yourls -v /sitemap:/sitemap build_yourls_uploader
+          docker run --rm --network=pids_yourls_host --name build_yourls -e YOURLS_DB_PASS -v /sitemap:/sitemap build_yourls_uploader
           docker exec pids-mysql-1 sh -c "mysqldump -u root --password=${{ secrets.YOURLS_DB_PASS }} --add-drop-database -A | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
           mkdir backup
           cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
