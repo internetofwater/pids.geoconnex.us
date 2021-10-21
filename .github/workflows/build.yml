@@ -64,15 +64,16 @@ jobs:
           context: yourls
 
       - name: Push sitemap to geoconnex.us
-        uses: dmnemec/copy_file_to_another_repo_action@main
+        uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source_file: 'sitemap'
-          destination_repo: 'webb-ben/geoconnex.us'
-          destination_branch: 'dev'
-          user_email: 'benjamin.miller.webb@gmail.com'
-          user_name: 'webb-ben'
+          source-directory: 'sitemap'
+          destination-repository-name: 'webb-ben/geoconnex.us'
+          target-branch: 'dev'
+          target-directory: 'sitemap'
+          user-email: 'benjamin.miller.webb@gmail.com'
+          user-name: 'webb-ben'
 
       - name: Push backup to geoconnex.us
         uses: dmnemec/copy_file_to_another_repo_action@main
