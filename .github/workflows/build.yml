@@ -42,7 +42,7 @@ jobs:
           YOURLS_DB_PASS: ${{ secrets.YOURLS_DB_PASS }}
         run: |
           docker run --rm --network=pids_yourls_host --name build_yourls --env YOURLS_DB_PASS=${YOURLS_DB_PASS} --env YOURLS_DB_USER=${YOURLS_DB_USER} -v /sitemap:/sitemap build_yourls_uploader
-          docker exec pids-mysql-1 sh -c "mysqldump -u ${YOURLS_DB_USER} --password=${YOURLS_DB_PASS} --add-drop-database --databases yourls | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
+          docker exec pids-mysql-1 sh -c "mysqldump -u ${YOURLS_DB_USER} --password=${YOURLS_DB_PASS} --databases --hex-blob --single-transaction --routines --no-autocommit --default-character-set=utf8mb4 --master-data yourls | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
           mkdir backup
           cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
           cp -R /sitemap sitemap
