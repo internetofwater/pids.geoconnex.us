@@ -29,6 +29,7 @@ jobs:
 
       - name: Build MySQL and Python containers for Yourls
         env:
+          YOURLS_DB_USER: ${{ secrets.YOURLS_DB_USER }}
           YOURLS_DB_PASS: ${{ secrets.YOURLS_DB_PASS }}
         run: |
           docker compose up -d --build
@@ -37,10 +38,11 @@ jobs:
 
       - name: Fill Yourls table with data from namespaces
         env:
+          YOURLS_DB_USER: ${{ secrets.YOURLS_DB_USER }}
           YOURLS_DB_PASS: ${{ secrets.YOURLS_DB_PASS }}
         run: |
-          docker run --rm --network=pids_yourls_host --name build_yourls --env YOURLS_DB_PASS=${YOURLS_DB_PASS} -v /sitemap:/sitemap build_yourls_uploader
-          docker exec pids-mysql-1 sh -c "mysqldump -u root --password=${YOURLS_DB_PASS} --add-drop-database -A | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
+          docker run --rm --network=pids_yourls_host --name build_yourls --env YOURLS_DB_PASS=${YOURLS_DB_PASS} --env YOURLS_DB_USER=${YOURLS_DB_USER} -v /sitemap:/sitemap build_yourls_uploader
+          docker exec pids-mysql-1 sh -c "mysqldump -u ${YOURLS_DB_USER} --password=${YOURLS_DB_PASS} --add-drop-database yourls | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
           mkdir backup
           cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
           cp -R /sitemap sitemap
