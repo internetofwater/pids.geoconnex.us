@@ -4,7 +4,7 @@ services:
     mysql:
         image: mysql:5.7
         environment:
-            MYSQL_ROOT_PASSWORD: ${SQL_ROOT_PASS}
+            MYSQL_ROOT_PASSWORD: ${YOURLS_DB_PASS:-arootpassword}
         restart: always
         networks:
             - yourls_host
