@@ -73,9 +73,9 @@ class yourls(Yourls):
 
         if self.__to_db:
             mydb = mysql.connector.connect(
-                host=os.environ.get('YOURLS_HOST', 'mysql'),
-                user=os.environ.get('YOURLS_USER', 'root'),
-                password=os.environ.get('YOURLS_DB_PASS', 'arootpassword'),
+                host=os.environ.get('YOURLS_DB_SITE') or 'mysql',
+                user=os.environ.get('YOURLS_DB_USER') or 'root',
+                password=os.environ.get('YOURLS_DB_PASS') or 'arootpassword',
                 database="yourls"
             )
             sql_statement = 'DELETE FROM yourls_url WHERE ip = "0.0.0.0"'
