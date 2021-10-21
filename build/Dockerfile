@@ -1,6 +1,6 @@
 FROM python
 
-ENV YOURLS_DB_PASS=${YOURLS_DB_PASS}
+ENV YOURLS_DB_PASS=${YOURLS_DB_PASS:-arootpassword}
 
 RUN mkdir /build
 COPY . /build/
