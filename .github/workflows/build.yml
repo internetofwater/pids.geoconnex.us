@@ -44,7 +44,7 @@ jobs:
           docker run --rm --network=pids_yourls_host --name build_yourls \
             --env YOURLS_DB_PASS=${YOURLS_DB_PASS} --env YOURLS_DB_USER=${YOURLS_DB_USER} \
             -v /sitemap:/sitemap build_yourls_uploader
-          docker exec -it pids-mysql-1 sh -c \
+          docker exec pids-mysql-1 sh -c \
             "mysqldump --databases yourls \
               -u ${YOURLS_DB_USER} --password=${YOURLS_DB_PASS} \
               --hex-blob --set-gtid-purged=OFF --default-character-set=utf8mb4 \
