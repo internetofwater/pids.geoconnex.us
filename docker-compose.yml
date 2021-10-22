@@ -13,7 +13,7 @@ services:
         # command: ["mysqld", "--datadir=/var/lib/mysql", "--user=mysql", "--log-bin=/var/lib/mysql/mysql-bin.log", "--binlog_do_db=test"]
         volumes:
          - ./mysql/:/docker-entrypoint-initdb.d/
-         - /var/lib/mysql:/var/lib/mysql
+        #  - /var/lib/mysql:/var/lib/mysql
 
     # python:
     #     build:
