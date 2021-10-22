@@ -12,13 +12,6 @@ services:
         command: [--innodb-api-enable-binlog=TRUE]
         volumes:
          - ./mysql/:/docker-entrypoint-initdb.d/
-         - /var/lib/mysql:/var/lib/mysql
-    #
-    #         YOURLS_PASS: ${YOURLS_PASS}
-    #         YOURLS_URL_CONVERT: ${YOURLS_URL_CONVERT}
-    #         YOURLS_PRIVATE_API: "${YOURLS_PRIVATE_API}"
-    #         YOURLS_UNIQUE_URLS: "${YOURLS_UNIQUE_URLS}"
-    #     restart: always
          - data_volume:/var/lib/mysql
     #
     # adminer:
