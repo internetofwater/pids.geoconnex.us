@@ -4,7 +4,7 @@ services:
     mysql:
         image: mysql:5.7
         environment:
-            MYSQL_USER: ${YOURLS_DB_USER:-yourls}
+            MYSQL_USER: ${YOURLS_DB_USER:-yourls_admin}
             MYSQL_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
         restart: always
         networks:
@@ -13,14 +13,25 @@ services:
         volumes:
          - ./mysql/:/docker-entrypoint-initdb.d/
          - data_volume:/var/lib/mysql
+
+    # python:
+    #     build:
+    #         context: ./build/
+    #     environment:
+    #         MYSQL_USER: ${YOURLS_DB_USER:-yourls_admin}
+    #         MYSQL_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
+    #     depends_on:
+    #         - mysql
+    #     networks:
+    #         - yourls_host
     
-    adminer:
-        image: adminer
-        restart: always
-        networks:
-            - yourls_host
-        ports:
-            - 6080:8080
+    # adminer:
+    #     image: adminer
+    #     restart: always
+    #     networks:
+    #         - yourls_host
+    #     ports:
+    #         - 6080:8080
 
 networks:
     yourls_host:
