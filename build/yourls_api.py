@@ -42,14 +42,6 @@ SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmo
 URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>\n"
 
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
-mydb = mysql.connector.connect(
-    host=os.environ.get('YOURLS_DB_HOST', 'mysql'),
-    user=os.environ.get('YOURLS_DB_USER', 'root'),
-    password=os.environ.get('YOURLS_DB_PASSWORD', 'arootpassword'),
-    database="yourls",
-    pool_name="yourls_loader",
-    pool_size = 3
-)
 def connection():
     """Get a connection and a cursor from the pool"""
     db = mysql.connector.connect(pool_name = 'yourls_loader')
@@ -73,10 +65,12 @@ class yourls(Yourls):
 
         if self.__to_db:
             mydb = mysql.connector.connect(
-                host=os.environ.get('YOURLS_DB_SITE') or 'mysql',
-                user=os.environ.get('YOURLS_DB_USER') or 'root',
-                password=os.environ.get('YOURLS_DB_PASS') or 'arootpassword',
-                database="yourls"
+                host=os.environ.get('YOURLS_DB_HOST') or 'mysql',
+                user=os.environ.get('YOURLS_DB_USER') or 'yourls',
+                password=os.environ.get('YOURLS_DB_PASSWORD') or 'arootpassword',
+                database="yourls",
+                pool_name="yourls_loader",
+                pool_size = 3
             )
             sql_statement = 'DELETE FROM yourls_url WHERE ip = "0.0.0.0"'
             cursor = mydb.cursor()

@@ -4,23 +4,23 @@ services:
     mysql:
         image: mysql:5.7
         environment:
-            MYSQL_ROOT_USER: ${YOURLS_DB_USER:-root}
-            MYSQL_ROOT_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
+            MYSQL_USER: ${YOURLS_DB_USER:-yourls}
+            MYSQL_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
         restart: always
         networks:
             - yourls_host
-        command: ["--innodb-api-enable-binlog=TRUE", "mysqld", "--datadir=/var/lib/mysql", "--user=mysql", "--server-id=1", "--log-bin=/var/lib/mysql/mysql-bin.log", "--binlog_do_db=test"]
+        command: ["mysqld", "--datadir=/var/lib/mysql", "--user=mysql", "--server-id=1", "--log-bin=/var/lib/mysql/mysql-bin.log", "--binlog_do_db=test"]
         volumes:
          - ./mysql/:/docker-entrypoint-initdb.d/
          - data_volume:/var/lib/mysql
-    #
-    # adminer:
-    #     image: adminer
-    #     restart: always
-    #     networks:
-    #         - yourls_host
-    #     ports:
-    #         - 6080:8080
+    
+    adminer:
+        image: adminer
+        restart: always
+        networks:
+            - yourls_host
+        ports:
+            - 6080:8080
 
 networks:
     yourls_host:
