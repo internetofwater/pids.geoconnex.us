@@ -9,7 +9,7 @@ services:
         restart: always
         networks:
             - yourls_host
-        command: --innodb-api-enable-binlog=TRUE
+        command: ["--innodb-api-enable-binlog=TRUE", "mysqld", "--datadir=/var/lib/mysql", "--user=mysql", "--server-id=1", "--log-bin=/var/lib/mysql/mysql-bin.log", "--binlog_do_db=test"]
         volumes:
          - ./mysql/:/docker-entrypoint-initdb.d/
          - data_volume:/var/lib/mysql
