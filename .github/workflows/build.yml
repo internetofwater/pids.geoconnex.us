@@ -42,9 +42,9 @@ jobs:
           YOURLS_DB_PASSWORD: ${{ secrets.YOURLS_DB_PASSWORD }}
         run: |
           docker run --rm --network=pids_yourls_host --name build_yourls \
-            --env MYSQL_PASSWORD=${YOURLS_DB_PASSWORD:-arootpassword} --env MYSQL_USER=${YOURLS_DB_USER:-yourls_admin} \
+            --env YOURLS_DB_PASSWORD=${YOURLS_DB_PASSWORD:-arootpassword} --env YOURLS_DB_USER=${YOURLS_DB_USER:-root} \
             -v /sitemap:/sitemap build_yourls_uploader
-          docker exec pids-mysql-1 sh -c "mysqldump --databases yourls -u ${YOURLS_DB_USER:-yourls_admin} --password=${YOURLS_DB_PASSWORD:-arootpassword} --hex-blob --set-gtid-purged=OFF --default-character-set=utf8mb4 --single-transaction --routines --no-autocommit --master-data | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
+          docker exec pids-mysql-1 sh -c "mysqldump --databases yourls -u ${YOURLS_DB_USER:-root} --password=${YOURLS_DB_PASSWORD:-arootpassword} --hex-blob --set-gtid-purged=OFF --default-character-set=utf8mb4 --single-transaction --routines --no-autocommit --master-data | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
           mkdir backup
           cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
           cp -R /sitemap sitemap
