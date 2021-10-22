@@ -40,7 +40,14 @@ SITEMAP = '/sitemap/'
 URI_STEM = os.environ.get('URI_STEM', 'https://geoconnex.us')
 SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>\n"
 URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>\n"
-
+mydb = mysql.connector.connect(
+    host=os.environ.get('YOURLS_DB_HOST') or 'mysql',
+    user=os.environ.get('MYSQL_USER') or 'yourls_admin',
+    password=os.environ.get('MYSQL_PASSWORD') or 'arootpassword',
+    database="yourls",
+    pool_name="yourls_loader",
+    pool_size = 3
+)
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
 def connection():
     """Get a connection and a cursor from the pool"""
@@ -64,16 +71,8 @@ class yourls(Yourls):
         self.__to_db = kwargs.get('_via_yourls_', True)
 
         if self.__to_db:
-            mydb = mysql.connector.connect(
-                host=os.environ.get('YOURLS_DB_HOST') or 'mysql',
-                user=os.environ.get('MYSQL_USER') or 'yourls_admin',
-                password=os.environ.get('MYSQL_PASSWORD') or 'arootpassword',
-                database="yourls",
-                pool_name="yourls_loader",
-                pool_size = 3
-            )
+            mydb, cursor = connection()
             sql_statement = 'DELETE FROM yourls_url WHERE ip = "0.0.0.0"'
-            cursor = mydb.cursor()
             cursor.execute(sql_statement)
             mydb.commit()
             print(cursor.rowcount, "was deleted.")
