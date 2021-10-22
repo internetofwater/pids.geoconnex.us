@@ -43,8 +43,8 @@ URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\
 
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
 mydb = mysql.connector.connect(
-    host=os.environ.get('YOURLS_HOST', 'mysql'),
-    user=os.environ.get('YOURLS_USER', 'root'),
+    host=os.environ.get('YOURLS_DB_HOST', 'mysql'),
+    user=os.environ.get('YOURLS_DB_USER', 'root'),
     password=os.environ.get('YOURLS_DB_PASSWORD', 'arootpassword'),
     database="yourls",
     pool_name="yourls_loader",
