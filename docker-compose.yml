@@ -11,7 +11,7 @@ services:
             - yourls_host
         # command: ["mysqld", "--datadir=/var/lib/mysql", "--user=mysql", "--log-bin=/var/lib/mysql/mysql-bin.log", "--binlog_do_db=test"]
         command: 
-            - --innodb-api-enable-binlog=True
+            - --server-id=1
             - --gtid-mode=ON
             - --enforce-gtid-consistency=ON
             - --binlog-checksum=NONE
