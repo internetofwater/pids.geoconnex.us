@@ -10,7 +10,14 @@ services:
         networks:
             - yourls_host
         # command: ["mysqld", "--datadir=/var/lib/mysql", "--user=mysql", "--log-bin=/var/lib/mysql/mysql-bin.log", "--binlog_do_db=test"]
-        # command: ["--innodb-api-enable-binlog=True"]
+        command: 
+            - --innodb-api-enable-binlog=True
+            - --gtid-mode=ON
+            - --enforce-gtid-consistency=ON
+            - --binlog-checksum=NONE
+            - --log-slave-updates=ON
+            - --log-bin=binlog
+            - --binlog-format=ROW
         volumes:
          - ./mysql/:/docker-entrypoint-initdb.d/
          - data_volume:/var/lib/mysql
