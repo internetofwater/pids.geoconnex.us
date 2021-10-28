@@ -20,6 +20,7 @@ function yourls_db_connect() {
     $user = YOURLS_DB_USER;
     $pass = YOURLS_DB_PASS;
     $dbname = YOURLS_DB_NAME;
+    $socketDir = getenv('DB_SOCKET_DIR') ?: '/cloudsql';
 
     // This action is deprecated
     yourls_do_action( 'set_DB_driver', 'deprecated' );
@@ -40,8 +41,15 @@ function yourls_db_connect() {
      * 'sqlite:/opt/databases/mydb.sq3'
      * 'pgsql:host=192.168.13.37;port=5432;dbname=omgwtf'
      */
-    $dsn = sprintf( 'mysql:host=%s;dbname=%s;charset=%s', $dbhost, $dbname, $charset );
-    $dsn = yourls_apply_filter( 'db_connect_custom_dsn', $dsn );
+    // $dsn = sprintf( 'mysql:host=%s;dbname=%s;charset=%s', $dbhost, $dbname, $charset );
+    // Connect using UNIX sockets
+    $dsn = sprintf(
+        'mysql:dbname=%s;unix_socket=%s/%s',
+        $dbName,
+        $socketDir,
+        $dbname
+    );
+    // $dsn = yourls_apply_filter( 'db_connect_custom_dsn', $dsn );
 
     /**
      * PDO driver options and attributes
