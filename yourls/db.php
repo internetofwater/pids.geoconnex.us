@@ -45,9 +45,9 @@ function yourls_db_connect() {
     // Connect using UNIX sockets
     $dsn = sprintf(
         'mysql:dbname=%s;unix_socket=%s/%s',
-        $dbName,
+        $dbname,
         $socketDir,
-        $dbname
+        $dbhost
     );
     // $dsn = yourls_apply_filter( 'db_connect_custom_dsn', $dsn );
 
