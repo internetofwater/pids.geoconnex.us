@@ -47,8 +47,8 @@ jobs:
           docker exec pids-mysql-1 sh -c "mysqldump --databases yourls -u ${YOURLS_DB_USER:-root} --password=${YOURLS_DB_PASSWORD:-arootpassword} --hex-blob --default-character-set=utf8mb4 --skip-triggers --set-gtid-purged=OFF | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
           mkdir backup
           cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
-          cp -R /sitemap sitemap
           cp -R /sitemap yourls/sitemap
+          zip yourls/sitemap > backup/sitemap.zip
           docker compose down
 
       - name: Build and push geoconnex-mysql
@@ -67,18 +67,6 @@ jobs:
           tags: webbben/pids-geoconnex-yourls:latest
           context: yourls
 
-      - name: Push sitemap to geoconnex.us
-        uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source-directory: 'sitemap'
-          destination-repository-name: 'webb-ben/geoconnex.us'
-          target-branch: 'dev'
-          target-directory: 'sitemap'
-          user-email: 'benjamin.miller.webb@gmail.com'
-          user-name: 'webb-ben'
-
       - name: Push backup to geoconnex.us
         uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
         env:
@@ -87,7 +75,7 @@ jobs:
           source-directory: 'backup'
           destination-repository-name: 'webb-ben/geoconnex.us'
           target-branch: 'dev'
-          target-directory: 'backup'
+          target-directory: 'PID-server/backup'
           user-email: 'benjamin.miller.webb@gmail.com'
           user-name: 'webb-ben'
 
