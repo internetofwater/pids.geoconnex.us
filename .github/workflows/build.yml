@@ -48,8 +48,13 @@ jobs:
           mkdir backup
           cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
           cp -R /sitemap yourls/sitemap
-          zip yourls/sitemap > backup/sitemap.zip
           docker compose down
+
+      - name: Zip sitemap
+        uses: papeloto/action-zip@v1
+        with:
+          files: /sitemap
+          dest: backup/sitemap.zip
 
       - name: Build and push geoconnex-mysql
         id: docker_build_mysql
