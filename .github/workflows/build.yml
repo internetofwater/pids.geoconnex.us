@@ -6,7 +6,7 @@ on:
       - 'dev'
     #  - 'main'
     paths:
-      - 'namespaces/**'
+      - 'build/**'
 
 jobs:
   main:
@@ -33,7 +33,6 @@ jobs:
           YOURLS_DB_PASSWORD: ${{ secrets.YOURLS_DB_PASSWORD }}
         run: |
           docker compose up -d --build
-          cp -R namespaces/ ./build/namespaces/
           docker build -t build_yourls_uploader ./build/
 
       - name: Fill Yourls table with data from namespaces
