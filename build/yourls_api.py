@@ -29,22 +29,23 @@
 
 from pyourls3.client import *
 import mysql.connector
-from datetime import date, datetime, timedelta
+from datetime import datetime as dt
 import os
 import csv
 import json
 import xml.etree.ElementTree as ET
+from shutil import copyfile
 
 SITEMAP = '/sitemap/'
 URI_STEM = os.environ.get('URI_STEM', 'https://geoconnex.us')
-SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>"
-URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>"
+SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>\n"
+URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>\n"
 
 # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
 mydb = mysql.connector.connect(
-    host=os.environ.get('YOURLS_HOST', 'mysql'),
-    user=os.environ.get('YOURLS_USER', 'root'),
-    password=os.environ.get('YOURLS_DB_PASSWORD', 'arootpassword'),
+    host=os.environ.get('YOURLS_DB_HOST') or 'mysql',
+    user=os.environ.get('YOURLS_DB_USER') or  'root',
+    password=os.environ.get('YOURLS_DB_PASSWORD') or 'arootpassword',
     database="yourls",
     pool_name="yourls_loader",
     pool_size = 3
@@ -71,14 +72,8 @@ class yourls(Yourls):
         self.__to_db = kwargs.get('_via_yourls_', True)
 
         if self.__to_db:
-            mydb = mysql.connector.connect(
-                host=os.environ.get('YOURLS_HOST', 'mysql'),
-                user=os.environ.get('YOURLS_USER', 'root'),
-                password=os.environ.get('YOURLS_DB_PASSWORD', 'arootpassword'),
-                database="yourls"
-            )
+            mydb, cursor = connection()
             sql_statement = 'DELETE FROM yourls_url WHERE ip = "0.0.0.0"'
-            cursor = mydb.cursor()
             cursor.execute(sql_statement)
             mydb.commit()
             print(cursor.rowcount, "was deleted.")
@@ -195,7 +190,8 @@ class yourls(Yourls):
             raise exceptions.Pyourls3ParamError('filename')
 
         # Clean input for inserting
-        extra = [datetime.now().date(),'0.0.0.0', 0]
+        time_ = self._get_filetime(filename)
+        extra = [time_,'0.0.0.0', 0]
         file = csv_ if csv_ else open(filename, 'r')
         lines = file.split("\n")
         split_ = [line.split(',') for line in lines[:-1]]
@@ -218,7 +214,7 @@ class yourls(Yourls):
             [print(l) if l != 6 else None for l in split_]
                     
         mydb.commit()
-        print(cursor.rowcount, "was inserted.")
+        # print(cursor.rowcount, "was inserted.")
         cursor.close()
         mydb.close()
 
@@ -235,8 +231,8 @@ class yourls(Yourls):
         """
         if not filename:
             raise exceptions.Pyourls3ParamError('filename')
-
-        file = csv_ if csv_ else open(filename.split('_')[0], 'r')
+        fname_ = filename.split('_')[0]
+        file = csv_ if csv_ else open(fname_, 'r')
         lines = file.split("\n")
         split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
@@ -244,20 +240,19 @@ class yourls(Yourls):
         tree = ET.parse('./sitemap-url.xml')
         sitemap = tree.getroot()
         for line in split_:
-            if not line.startswith('/'):
-                url_ = url_join(URI_STEM, line)
-                t = URLSET_FOREACH.format(url_, datetime.now())
-                link_xml = ET.fromstring(t)
-                sitemap.append(link_xml)
+            if '$' in line:
+                return
+
+            time_ = self._get_filetime(fname_)
+            url_ = url_join(URI_STEM, line)
+            t = URLSET_FOREACH.format(url_, time_)
+            link_xml = ET.fromstring(t)
+            sitemap.append(link_xml)
 
         # Write sitemap.xml
         tree.write(f'{filename}.xml')
 
     def make_sitemap(self, files):
-        # Setup file system:
-        if not os.path.isdir('/sitemap/'):
-            os.makedirs('/sitemap/')
-
         tree = ET.parse('./sitemap-schema.xml')
         sitemap = tree.getroot()
         for f in files:
@@ -268,15 +263,36 @@ class yourls(Yourls):
             except ValueError:
                 continue
 
-            tree_ = ET.parse(f)
-            name_ = f"/sitemap/{f.split('/').pop()}"
-            tree_.write(name_)
-            url_ = url_join(URI_STEM, name_)
-            t = SITEMAP_FOREACH.format(url_, datetime.now())
+            # Check buildpath
+            _ = f.split('/')
+            name_ = _.pop()
+            parent = '/'.join(_[_.index('namespaces')+1:])
+            path_ = f'/sitemap/{parent}'
+            if not os.path.exists(path_):
+                os.makedirs(path_)
+
+            # Copy xml to /sitemaps
+            fpath_ = f'{path_}/{name_}'
+            copyfile(f, fpath_)
+
+            # create to link /sitemap/_sitemap.xml
+            time_ = self._get_filetime(fpath_)
+            url_ = url_join(URI_STEM, fpath_)
+            t = SITEMAP_FOREACH.format(url_, time_)
+
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
+
         tree.write('/sitemap/_sitemap.xml')
         print('finished task')
+
+    def _get_filetime(self, fpath_):
+        try:
+            _ = os.path.getmtime(fpath_)
+            time_ = dt.fromtimestamp(_)
+        except OSError:
+            time_ = dt.now()
+        return time_
 
     def _handle_csvs(self, files):
         """
