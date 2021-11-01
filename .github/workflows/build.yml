@@ -1,4 +1,4 @@
-name: geoconnex.us database build
+name: Yourls build for geoconnex.us
 
 on: 
   push:
@@ -52,10 +52,10 @@ jobs:
       - name: Zip sitemap
         uses: papeloto/action-zip@v1
         with:
-          files: /sitemap
+          files: yourls/sitemap
           dest: backup/sitemap.zip
 
-      - name: Build and push geoconnex-mysql
+      - name: Build and push yourls-mysql
         id: docker_build_mysql
         uses: docker/build-push-action@v2
         with:
@@ -63,7 +63,7 @@ jobs:
           tags: internetofwater/yourls-mysql:latest
           context: mysql
 
-      - name: Build and push geoconnex-yourls
+      - name: Build and push yourls
         id: docker_build_yourls
         uses: docker/build-push-action@v2
         with:
@@ -76,9 +76,9 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: 'backup'
-          destination-repository-name: 'webb-ben/geoconnex.us'
-          target-branch: 'dev'
-          target-directory: 'PID-server/backup'
-          user-email: 'benjamin.miller.webb@gmail.com'
-          user-name: 'webb-ben'
+          source-directory: backup
+          destination-repository-name: webb-ben/geoconnex.us
+          target-branch: dev
+          target-directory: PID-server/backup
+          user-email: benjamin.miller.webb@gmail.com
+          user-name: webb-ben
