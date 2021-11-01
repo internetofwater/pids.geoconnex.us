@@ -5,8 +5,8 @@ on:
     branches: 
       - 'dev'
     #  - 'main'
-    # paths:
-    #   - 'namespaces/**'
+    paths:
+      - 'namespaces/**'
 
 jobs:
   main:
@@ -61,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: webbben/pids-geoconnex-mysql:latest
+          tags: internetofwater/yourls-mysql:latest
           context: mysql
 
       - name: Build and push geoconnex-yourls
@@ -69,7 +69,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: webbben/pids-geoconnex-yourls:latest
+          tags: internetofwater/yourls:latest
           context: yourls
 
       - name: Push backup to geoconnex.us
@@ -83,4 +83,3 @@ jobs:
           target-directory: 'PID-server/backup'
           user-email: 'benjamin.miller.webb@gmail.com'
           user-name: 'webb-ben'
-
