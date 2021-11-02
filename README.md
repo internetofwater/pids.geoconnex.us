@@ -1,56 +1,23 @@
-# YOURLS PID service
+# Geoconnex-Yourls Permanent Identifier Service (PIDS)
 
 ### Description
-Attempts to mimic the this [PID service](https://github.com/SISS/PID) using [YOURLS](https://yourls.org), a more actively maintained platform.
-YOURLS performs much better at scale ( > 300,000 entries), and allows for the easy modification of the capacities of the service using YOURLS plugins. 
+This repository is responsible for CI/CD of Geoconnex PIDS. The workflow of this repository is responsible for building the Docker images of [Yourls](https://hub.docker.com/_/yourls) and [MySQL:5.7](https://hub.docker.com/_/mysql) for https://geoconnex.us. Commits to the `namespaces` folder of [geoconnex.us](https://github.com/internetofwater/geoconnex.us) are automatically commited to the `build/namespaces` folder local to this repository. The GitHub workflow for this repository generates a SQL dump and a sitemap of the `namespaces` folder. These artifacts are used in the building of the Docker images `internetofwater/yourls` and `internetofwater/yourls-mysql` as well as being committed to back to [geoconnex.us/PID-server/backup](https://github.com/internetofwater/geoconnex.us/tree/master/PID-server).
 
-### Requires
-- Docker & docker-compose.
-
-Community YOURLS plugins used & activated:
-- [reset-urls](https://gist.github.com/ozh/a0090f46569b50835520d95f9481d9fd#file-plugin-php) 
-- [always-302](https://github.com/tinjaw/Always-302) (modified to 303)
-- [keep-querystring](https://github.com/rinogo/yourls-keep-query-string)
-- [redirect-index](https://github.com/tomslominski/yourls-redirect-index)
-- [request-forwarder](https://github.com/webb-ben/plugins/tree/master/request-forward)
-- [bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
-- [sleeky-backend](https://sleeky.flynntes.com)
-- change-title
-
-YOURLS plugins developed for geoconnex
-- [bulk-API-import](https://github.com/webb-ben/plugins/tree/main/bulk-api-import)
-- [regex-in-urls](https://github.com/webb-ben/plugins/tree/master/regex-in-urls)
+### Features of this Repository
+More information can be found in the README.md of each folder. As a brief overview:
+- `.github/workflows`: YAML configuration for GitHub actions.
+- `build`: Files required to build python container to load namespaces into MySQL and build sitemap.
+- `mysql`: Files required for Continuous Deployment of Yourls table in MySQL. Used to generate `internetofwater/yourls-mysql`.
+- `yourls`: Files required for the Continuous Deployment of Yourls. Used to generate `internetofwater/yourls` (Note: Sitemap is built and located in this folder during the workflow, but is hosted in the [geoconnex.us](https://github.com/internetofwater/geoconnex.us) repository and `internetofwater/yourls` Docker image)
 
 ### Installation
 
 1. Clone the repository to your own personal folder. <br>
-   `git clone https://github.com/internetofwater/IoW-YOURLS`<br>
-   `cd IoW-YOURLS`<br>
+   `git clone https://github.com/internetofwater/pids.geoconnex.us`<br>
+   `cd pids.geoconnex.us`<br>
    `docker-compose up -d --build`
 2. Open yourls admin interface and install yourls.
 3. Enable all plugins before adding any entries. 
-
-### Populating database
-Under [python](python/README.md) we have built a [Dockerfile](https://github.com/internetofwater/IoW-YOURLS/blob/main/python/Dockerfile-url)
-that builds a docker image designed to populate a YOURLS database with csv files formatted similarly to the geoconnex contribution format. The image is available on Dockerhub at [internetofwater/post-geoconnex](https://hub.docker.com/repository/docker/internetofwater/post-geoconnex).
-
-The basic command is
-`docker run -i -t --rm internetofwater/post-geoconnex python yourls_client.py --options <path/to/csv>` with the following options
-
-`-s <url>` The stem of the persistent identifiers. In our case, usually `https://geoconnex.us/`
-
-`-a <url>` The url of the PID server management layer. In our case, `https://pids.geoconnex.us`
-
-`-u` The username (same as before)
-
-`-p` The password (same as before)
-
-`<path/to/csv>` can be a local directory with many CSV files, the path of a single CSV file, or the URL of a hosted CSV file.
-
-For example usage:
-
-``` docker run -i -t --rm internetofwater/post-geoconnex python yourls_client.py -s https://geoconnex.us/ -a https://pids.geoconnex.us -u <user> -p <password> https://raw.githubusercontent.com/internetofwater/geoconnex.us/iow/namespaces/iow/test.csv```
-
 
 ### License
 This service is licensed under the [MIT License](LICENSE).
