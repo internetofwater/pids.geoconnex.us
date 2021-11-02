@@ -6,7 +6,7 @@ on:
       - 'dev'
     #  - 'main'
     paths:
-      - 'build/**'
+      - 'build/namespaces/**'
 
 jobs:
   main:
