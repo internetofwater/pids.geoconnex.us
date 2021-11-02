@@ -3,8 +3,8 @@ name: Yourls build for geoconnex.us
 on: 
   push:
     branches: 
-      - 'dev'
-    #  - 'main'
+      # - 'dev'
+     - 'main'
     paths:
       - 'build/namespaces/**'
 
@@ -78,7 +78,7 @@ jobs:
         with:
           source-directory: backup
           destination-repository-name: internetofwater/geoconnex.us
-          target-branch: dev
+          target-branch: master
           target-directory: PID-server/backup
           user-email: benjamin.miller.webb@gmail.com
           user-name: webb-ben
