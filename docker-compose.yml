@@ -2,40 +2,68 @@ version: '3.6'
 
 services:
     mysql:
-        build:
-            context: ./mysql/
+        image: mysql:5.7
         environment:
-            MYSQL_ROOT_PASSWORD: ${SQL_ROOT_PASS}
+            MYSQL_ROOT_USER: ${YOURLS_DB_USER:-root}
+            MYSQL_ROOT_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
         restart: always
         networks:
             - yourls_host
+        # command: ["mysqld", "--datadir=/var/lib/mysql", "--user=mysql", "--log-bin=/var/lib/mysql/mysql-bin.log", "--binlog_do_db=test"]
+        command: 
+            - --server-id=1
+            - --innodb-api-enable-binlog=TRUE
+            - --gtid-mode=ON
+            - --enforce-gtid-consistency=ON
+            - --binlog-checksum=NONE
+            - --log-slave-updates=ON
+            - --log-bin=binlog
+            - --binlog-format=ROW
         volumes:
+         - ./mysql/:/docker-entrypoint-initdb.d/
          - data_volume:/var/lib/mysql
-
-    yourls:
-        build:
-            context: ./yourls/
-        environment:
-            YOURLS_DB_PASS: ${SQL_ROOT_PASS}
-            YOURLS_SITE: ${YOURLS_HOSTNAME}:${YOURLS_PORT}
-            YOURLS_USER: ${YOURLS_USER}
-            YOURLS_PASS: ${YOURLS_PASS}
-            YOURLS_URL_CONVERT: ${YOURLS_URL_CONVERT}
-            YOURLS_PRIVATE_API: "${YOURLS_PRIVATE_API}"
-            YOURLS_UNIQUE_URLS: "${YOURLS_UNIQUE_URLS}"
-        restart: always
-        networks: 
-            - yourls_host
-        ports:
-            - ${YOURLS_PORT}:80
-    
-    adminer:
-        image: adminer
-        restart: always
-        networks:
-            - yourls_host
-        ports:
-            - 6080:8080
+    #
+    # python:
+    #     build:
+    #         context: ./build/
+    #     environment:
+    #         MYSQL_USER: ${YOURLS_DB_USER:-yourls_admin}
+    #         MYSQL_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
+    #     depends_on:
+    #         - mysql
+    #     networks:
+    #         - yourls_host
+    #
+    # yourls:
+    #     image: yourls:latest
+    #     environment:
+    #         DB_SOCKET_DIR: /var
+    #         YOURLS_DB_HOST: /run/mysqld/mysqld.sock;host=mysql
+    #         YOURLS_DB_PASS: arootpassword
+    #         YOURLS_SITE: http://localhost:8080
+    #         YOURLS_USER: yourls-admin
+    #         YOURLS_PASS: apassword
+    #         YOURLS_URL_CONVERT: 62
+    #         YOURLS_PRIVATE_API: true
+    #         YOURLS_UNIQUE_URLS: false
+    #     restart: always
+    #     depends_on:
+    #         - mysql
+    #     networks: 
+    #        - yourls_host
+    #     volumes:
+    #         - ./yourls/plugins:/var/www/html/user/plugins
+    #         - ./plugins/redirect-index/index.php:/var/www/html
+    #     ports:
+    #         - 8080:80
+    #
+    # adminer:
+    #     image: adminer
+    #     restart: always
+    #     networks:
+    #         - yourls_host
+    #     ports:
+    #         - 6080:8080
 
 networks:
     yourls_host:
