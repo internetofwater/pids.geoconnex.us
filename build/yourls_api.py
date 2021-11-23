@@ -250,7 +250,7 @@ class yourls(Yourls):
             sitemap.append(link_xml)
 
         # Write sitemap.xml
-        tree.write(f'{filename}.xml')
+        tree.write(f'{filename}.xml', encoding='utf-8', xml_declaration=True)
 
     def make_sitemap(self, files):
         tree = ET.parse('./sitemap-schema.xml')
@@ -283,7 +283,7 @@ class yourls(Yourls):
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
 
-        tree.write('/sitemap/_sitemap.xml')
+        tree.write('/sitemap/_sitemap.xml', encoding='utf-8', xml_declaration=True)
         print('finished task')
 
     def _get_filetime(self, fpath_):
