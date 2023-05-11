@@ -8,7 +8,6 @@ NHDPlusV2 Census identifiers redirect to a geojson representation that shows the
 | https://geoconnex.us/iow/nhdpv2-census/2010/comid/2889342/block/080130121012017 | 2010        | 2889342 | 080130121011007 |
 | https://geoconnex.us/iow/nhdpv2-census/2020/comid/2889342/block/080130121012015 | 2020        | 2889342 | 080130121011007 |
 
-
 Homepage:
 * https://github.com/internetofwater/nhdpv2-census
 
