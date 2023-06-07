@@ -1,6 +1,7 @@
 name: Yourls build for geoconnex.us
 
 on:
+  workflow_dispatch:
   push:
     branches:
       # - 'dev'
