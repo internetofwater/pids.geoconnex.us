@@ -1,8 +1,8 @@
 # =================================================================
 #
-# Authors: Benjamin Webb <benjamin.miller.webb@gmail.com>
+# Authors: Benjamin Webb <bwebb@lincolninst.edu>
 #
-# Copyright (c) 2021 Benjamin Webb
+# Copyright (c) 2023 Benjamin Webb
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -27,33 +27,56 @@
 #
 # =================================================================
 
-from pyourls3.client import *
-import mysql.connector
-from datetime import datetime as dt
-import os
+
 import csv
 import json
+from datetime import datetime as dt
+import mysql.connector
+import os
+from pathlib import Path
+from pyourls3.client import exceptions, Yourls
+import requests
+from shutil import copy2
+import time
 import xml.etree.ElementTree as ET
-from shutil import copyfile
 
-SITEMAP = '/sitemap/'
 URI_STEM = os.environ.get('URI_STEM', 'https://geoconnex.us')
-SITEMAP_FOREACH = "\n\t<sitemap>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</sitemap>\n"
-URLSET_FOREACH = "\n\t<url>\n\t\t<loc> {} </loc>\n\t\t<lastmod> {} </lastmod>\n\t</url>\n"
+SITEMAP = Path('/sitemap')
+SITEMAP_ARGS = {'encoding': 'utf-8', 'xml_declaration': True}
+SITEMAP_FOREACH = '''
+<sitemap>
+    <loc>{}</loc>
+    <lastmod>{}</lastmod>
+</sitemap>\n
+'''
+URLSET_FOREACH = '''
+<url>
+    <loc>{}</loc>
+    <lastmod>{}</lastmod>
+</url>
+'''
 
-# https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
-mydb = mysql.connector.connect(
-    host=os.environ.get('YOURLS_DB_HOST') or 'mysql',
-    user=os.environ.get('YOURLS_DB_USER') or  'root',
-    password=os.environ.get('YOURLS_DB_PASSWORD') or 'arootpassword',
-    database="yourls",
-    pool_name="yourls_loader",
-    pool_size = 3
-)
+
+try:
+    # https://stackoverflow.com/questions/60286623/python-loses-connection-to-mysql-database-after-about-a-day
+    mysql.connector.connect(
+        host=os.environ.get('YOURLS_DB_HOST') or 'mysql',
+        user=os.environ.get('YOURLS_DB_USER') or 'root',
+        password=os.environ.get('YOURLS_DB_PASSWORD') or 'arootpassword',
+        database="yourls",
+        pool_name="yourls_loader",
+        pool_size=3
+    )
+except Exception as err:
+    print(err)
+    print('Unable to connect to database')
+
+
 def connection():
     """Get a connection and a cursor from the pool"""
-    db = mysql.connector.connect(pool_name = 'yourls_loader')
+    db = mysql.connector.connect(pool_name='yourls_loader')
     return (db, db.cursor())
+
 
 def url_join(*parts):
     """
@@ -66,11 +89,11 @@ def url_join(*parts):
     """
     return '/'.join([p.strip().strip('/') for p in parts])
 
+
 class yourls(Yourls):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
-        self.__to_db = kwargs.get('_via_yourls_', True)
-
+        self.__to_db = kwargs.get('to_db',)
         if self.__to_db:
             mydb, cursor = connection()
             sql_statement = 'DELETE FROM yourls_url WHERE ip = "0.0.0.0"'
@@ -80,7 +103,7 @@ class yourls(Yourls):
             cursor.close()
             mydb.close()
         else:
-            _ = self._check_kwargs(('addr', 'user', 'passwd', 'key'))
+            _ = self._check_kwargs(('addr', 'user', 'passwd'))
             Yourls.__init__(self, *[v for k, v in _])
 
     def _check_kwargs(self, keys):
@@ -88,7 +111,8 @@ class yourls(Yourls):
         Parses kwargs for desired keys.
 
         :param keys: required, list. List of keys to retried from **kwargs.
-        :return: generator. Generator of key value pairs for each key in **kwargs.
+
+        :return: generator. key value pairs for each key in **kwargs.
 
         :raises: pyourls3.exceptions.Pyourls3ParamError
         """
@@ -104,7 +128,8 @@ class yourls(Yourls):
 
         :param keys: required, list. List of keys to retried from **kwargs.
         :param **kwargs: required, dict.
-        :return: generator. Generator of key value pairs for each key in **kwargs.
+
+        :return: generator. key value pairs for each key in **kwargs.
 
         :raises: pyourls3.exceptions.Pyourls3ParamError
         """
@@ -118,36 +143,40 @@ class yourls(Yourls):
         """
         Sends an API request to shorten a specified URL.
 
-        :param **kwargs: required, dict. Expects url, keyword, and title to be specified.
-        :return: dictionary. Full JSON response from the API, parsed into a dict
+        :param **kwargs: required, dict. Expects url, keyword, and title.
 
-        :raises: pyourls3.exceptions.Pyourls3ParamError, pyourls3.exceptions.Pyourls3HTTPError,
+        :return: dictionary. Full JSON response from the API
+
+        :raises: pyourls3.exceptions.Pyourls3ParamError,
           pyourls3.exceptions.Pyourls3APIError
         """
         _ = self.check_kwargs(('url', 'keyword', 'title'), **kwargs)
         specific_args = {'action': 'shorten_quick', **{k: v for k, v in _}}
 
-        r = requests.post(self.api_endpoint, data={**self.global_args, **specific_args})
+        r = requests.post(self.api_endpoint, data={
+                          **self.global_args, **specific_args})
         try:
             j = r.json()
         except json.decoder.JSONDecodeError:
-            raise exceptions.Pyourls3HTTPError(r.status_code, self.api_endpoint)
+            raise exceptions.Pyourls3HTTPError(
+                r.status_code, self.api_endpoint)
 
         if j.get("status") == "success":
             return j
         else:
-            raise exceptions.Pyourls3APIError(j["message"], j.get("code", j.get("errorCode")))
+            raise exceptions.Pyourls3APIError(
+                j["message"], j.get("code", j.get("errorCode")))
 
-
-    def shorten_csv(self, filename, csv = ''):
+    def shorten_csv(self, filename, csv=''):
         """
         Sends an API request to shorten a specified CSV.
 
         :param filename: required, string. Name of CSV to be shortened.
         :param csv: optional, list. Pre-parsed csv as list of strings.
-        :return: dictionary. Full JSON response from the API, parsed into a dict
 
-        :raises: pyourls3.exceptions.Pyourls3ParamError, pyourls3.exceptions.Pyourls3HTTPError,
+        :return: dictionary. Full JSON response from the API
+
+        :raises: pyourls3.exceptions.Pyourls3ParamError,
           pyourls3.exceptions.Pyourls3APIError
         """
         if not filename:
@@ -167,22 +196,25 @@ class yourls(Yourls):
         try:
             j = r.json()
         except json.decoder.JSONDecodeError:
-            raise exceptions.Pyourls3HTTPError(r.status_code, self.api_endpoint)
+            raise exceptions.Pyourls3HTTPError(
+                r.status_code, self.api_endpoint)
 
         if j.get("status") == "success":
             return j
         else:
-            raise exceptions.Pyourls3APIError(j["message"], j.get("code", j.get("errorCode")))
+            raise exceptions.Pyourls3APIError(
+                j["message"], j.get("code", j.get("errorCode")))
 
-    def post_mysql(self, filename, csv_ = ''):
+    def post_mysql(self, filename, csv_=''):
         """
         Sends an API request to shorten a specified CSV.
 
         :param filename: required, string. Name of CSV to be shortened.
         :param csv_: optional, list. Pre-parsed csv as list of strings.
-        :return: dictionary. Full JSON response from the API, parsed into a dict
 
-        :raises: pyourls3.exceptions.Pyourls3ParamError, pyourls3.exceptions.Pyourls3HTTPError,
+        :return: dictionary. Full JSON response from the API
+
+        :raises: pyourls3.exceptions.Pyourls3ParamError,
           pyourls3.exceptions.Pyourls3APIError
         """
         print(filename)
@@ -191,7 +223,7 @@ class yourls(Yourls):
 
         # Clean input for inserting
         time_ = self._get_filetime(filename)
-        extra = [time_,'0.0.0.0', 0]
+        extra = [time_, '0.0.0.0', 0]
         file = csv_ if csv_ else open(filename, 'r')
         lines = file.split("\n")
         split_ = [line.split(',') for line in lines[:-1]]
@@ -205,20 +237,20 @@ class yourls(Yourls):
 
         # Commit file to database
         SQL_STATEMENT = ("INSERT INTO yourls_url "
-                "(`keyword`, `url`, `title`, `timestamp`, `ip`, `clicks`)"
-                "VALUES (%s, %s, %s, %s, %s, %s)")
+                         "(`keyword`, `url`, `title`, `timestamp`, `ip`, `clicks`)"  # noqa
+                         "VALUES (%s, %s, %s, %s, %s, %s)")
         mydb, cursor = connection()
         try:
             cursor.executemany(SQL_STATEMENT, split_)
         except mysql.connector.errors.ProgrammingError:
-            [print(l) if l != 6 else None for l in split_]
-                    
+            print(split_)
+
         mydb.commit()
         # print(cursor.rowcount, "was inserted.")
         cursor.close()
         mydb.close()
 
-    def _make_sitemap(self, filename, csv_ = ''):
+    def _make_sitemap(self, filename, csv_=''):
         """
         Create sitmap.xml from csv file.
 
@@ -226,64 +258,73 @@ class yourls(Yourls):
         :param csv_: optional, list. Pre-parsed csv as list of strings.
         :return: None.
 
-        :raises: pyourls3.exceptions.Pyourls3ParamError, pyourls3.exceptions.Pyourls3HTTPError,
+        :raises: pyourls3.exceptions.Pyourls3ParamError,
           pyourls3.exceptions.Pyourls3APIError
         """
         if not filename:
             raise exceptions.Pyourls3ParamError('filename')
-        fname_ = filename.split('_')[0]
-        file = csv_ if csv_ else open(fname_, 'r')
-        lines = file.split("\n")
-        split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
-        # Build sitemaps for each csv file
-        tree = ET.parse('./sitemap-url.xml')
-        sitemap = tree.getroot()
-        for line in split_:
-            if '$' in line:
-                return
+        file = csv_ if csv_ else open(filename, 'r')
+        chunky_parsed = self.chunkify(file, 50000)
+        for i, chunk in enumerate(chunky_parsed):
+            lines = chunk.split("\n")
+            split_ = [line.split(',').pop(0) for line in lines[:-1]]
 
-            time_ = self._get_filetime(fname_)
-            url_ = url_join(URI_STEM, line)
-            t = URLSET_FOREACH.format(url_, time_)
-            link_xml = ET.fromstring(t)
-            sitemap.append(link_xml)
+            # Build sitemaps for each csv file
+            tree = ET.parse('./sitemap-url.xml')
+            ET.indent(tree, '  ')
+            sitemap = tree.getroot()
+            for line in split_:
+                if '$' in line:
+                    return
 
-        # Write sitemap.xml
-        tree.write(f'{filename}.xml', encoding='utf-8', xml_declaration=True)
+                time_ = self._get_filetime(filename)
+                url_ = url_join(URI_STEM, line)
+                t = URLSET_FOREACH.format(url_, time_)
+
+                link_xml = ET.fromstring(t)
+                sitemap.append(link_xml)
+
+            # Write sitemap.xml
+            fidx = f'{filename.stem}__{i}'
+            sitemap_time = os.path.getmtime(filename)
+            sitemap_file = (filename.parent / fidx).with_suffix('.xml')
+            tree.write(sitemap_file, **SITEMAP_ARGS)
+            os.utime(sitemap_file, (time.time(), sitemap_time))
 
     def make_sitemap(self, files):
         tree = ET.parse('./sitemap-schema.xml')
         sitemap = tree.getroot()
         for f in files:
             # Make sure file is sitemap
-            format_ = f[:-4].split('__').pop()
             try:
-                int(format_)
+                int(f.stem.split('__').pop())
             except ValueError:
                 continue
 
             # Check buildpath
-            _ = f.split('/')
-            name_ = _.pop()
-            parent = '/'.join(_[_.index('namespaces')+1:])
-            path_ = f'/sitemap/{parent}'
-            if not os.path.exists(path_):
-                os.makedirs(path_)
+            try:
+                parent = f.parent.relative_to("namespaces")
+            except ValueError:
+                parent = f.parent.relative_to("/build/namespaces")
+            path_ = (SITEMAP / parent)
+            path_.mkdir(parents=True, exist_ok=True)
 
             # Copy xml to /sitemaps
-            fpath_ = f'{path_}/{name_}'
-            copyfile(f, fpath_)
+            fpath_ = path_ / f.name
+            copy2(f, fpath_)
 
             # create to link /sitemap/_sitemap.xml
             time_ = self._get_filetime(fpath_)
-            url_ = url_join(URI_STEM, fpath_)
+            url_ = url_join(URI_STEM, str(fpath_))
             t = SITEMAP_FOREACH.format(url_, time_)
 
             link_xml = ET.fromstring(t)
             sitemap.append(link_xml)
+            ET.indent(tree, '  ')
 
-        tree.write('/sitemap/_sitemap.xml', encoding='utf-8', xml_declaration=True)
+        sitemap_out = SITEMAP / '_sitemap.xml'
+        tree.write(sitemap_out, **SITEMAP_ARGS)
         print('finished task')
 
     def _get_filetime(self, fpath_):
@@ -307,7 +348,7 @@ class yourls(Yourls):
         """
         Parses and shortens CSV file.
 
-        :param file: required, string or list of strings. Name of csv files to be shortened
+        :param file: required, name of csv to be shortened
         """
         if isinstance(file, list):
             self._handle_csvs(file)
@@ -315,19 +356,17 @@ class yourls(Yourls):
 
         parsed_csv = self.parse_csv(file)
         if self.__to_db:
-            chunky_parsed = self.chunkify( parsed_csv, 10000)
+            chunky_parsed = self.chunkify(parsed_csv, 10000)
             for chunk in chunky_parsed:
                 self.post_mysql(file, chunk)
         else:
-            chunky_parsed = self.chunkify( parsed_csv )
+            chunky_parsed = self.chunkify(parsed_csv)
 
             for chunk in chunky_parsed:
                 self.shorten_csv(file, chunk)
-        
-        chunky_parsed = self.chunkify( parsed_csv, 50000)
-        for i, chunk in enumerate(chunky_parsed):
-            self._make_sitemap(f'{file[:-4]}__{i}', chunk)
-    
+
+        self._make_sitemap(file, parsed_csv)
+
     def parse_csv(self, filename):
         """
         Parse CSV file into yourls-friendly csv.
@@ -335,7 +374,7 @@ class yourls(Yourls):
         :param filename: required, string. URL to be shortened.
         :return: list. Parsed csv.
         """
-        _ = self._check_kwargs(('keyword', 'url', 'title'))
+        _ = self._check_kwargs(('keyword', 'long_url', 'title'))
         vals = {k: v for k, v in _}
 
         try:
@@ -352,11 +391,12 @@ class yourls(Yourls):
             parsed_line = []
             for k, v in vals.items():
                 try:
-                    parsed_line.append( line[headers.index(v)].strip() )
+                    parsed_line.append(line[headers.index(v)].strip())
                 except (ValueError, IndexError):
                     continue
-            _ = self._check_kwargs(['uri_stem',])
-            ret_csv.append((','.join(parsed_line) + '\n').replace(*[v for k, v in _], ''))
+            _ = self._check_kwargs(['uri_stem', ])
+            ret_csv.append(
+                (','.join(parsed_line) + '\n').replace(*[v for k, v in _], ''))
 
         if not r:
             fp.close()

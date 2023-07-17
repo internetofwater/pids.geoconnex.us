@@ -40,7 +40,7 @@ jobs:
           YOURLS_DB_USER: ${{ secrets.YOURLS_DB_USER }}
           YOURLS_DB_PASSWORD: ${{ secrets.YOURLS_DB_PASSWORD }}
         run: |
-          docker compose -p pidsgeoconnexus up -d --build
+          docker compose up -d --build
           docker build -t build_yourls_uploader ./build/
 
       - name: Fill Yourls table with data from namespaces
@@ -50,11 +50,11 @@ jobs:
         run: |
           docker run --rm --network=pidsgeoconnexus_yourls_host --name build_yourls \
             --env YOURLS_DB_PASSWORD=${YOURLS_DB_PASSWORD:-arootpassword} --env YOURLS_DB_USER=${YOURLS_DB_USER:-root} \
-            -v /sitemap:/sitemap build_yourls_uploader
+            -v ./sitemap:/sitemap build_yourls_uploader
           docker exec pidsgeoconnexus-mysql-1  sh -c "mysqldump --databases yourls -u ${YOURLS_DB_USER:-root} --password=${YOURLS_DB_PASSWORD:-arootpassword} --hex-blob --default-character-set=utf8mb4 --skip-triggers --set-gtid-purged=OFF | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
           mkdir backup
           cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
-          cp -R /sitemap yourls/sitemap
+          cp -R ./sitemap yourls/sitemap
           docker compose down
 
       - name: Zip sitemap
