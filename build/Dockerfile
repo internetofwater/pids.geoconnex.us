@@ -1,4 +1,4 @@
-FROM python
+FROM python:3.9.13-slim
 
 RUN mkdir /build
 COPY . /build/
