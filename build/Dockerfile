@@ -1,5 +1,11 @@
 FROM python:3.9.13-slim
 
+RUN \
+    apt-get update -y \
+    && apt-get upgrade -y \
+    && apt-get install -y git \
+    && git clone -b master https://github.com/internetofwater/geoconnex.us.git /geoconnex.us
+
 RUN mkdir /build
 COPY . /build/
 

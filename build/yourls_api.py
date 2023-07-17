@@ -29,6 +29,7 @@
 
 
 import csv
+from git import Repo
 import json
 from datetime import datetime as dt
 import mysql.connector
@@ -91,9 +92,12 @@ def url_join(*parts):
 
 
 class yourls(Yourls):
+    geoconnex = Repo('/geoconnex.us')
+
     def __init__(self, **kwargs):
+        self.tree = self.geoconnex.heads.master.commit.tree
         self.kwargs = kwargs
-        self.__to_db = kwargs.get('to_db',)
+        self.__to_db = kwargs.get('to_db', True)
         if self.__to_db:
             mydb, cursor = connection()
             sql_statement = 'DELETE FROM yourls_url WHERE ip = "0.0.0.0"'
@@ -266,6 +270,7 @@ class yourls(Yourls):
 
         file = csv_ if csv_ else open(filename, 'r')
         chunky_parsed = self.chunkify(file, 50000)
+        file_time = self._get_filetime(filename)
         for i, chunk in enumerate(chunky_parsed):
             lines = chunk.split("\n")
             split_ = [line.split(',').pop(0) for line in lines[:-1]]
@@ -278,19 +283,18 @@ class yourls(Yourls):
                 if '$' in line:
                     return
 
-                time_ = self._get_filetime(filename)
                 url_ = url_join(URI_STEM, line)
-                t = URLSET_FOREACH.format(url_, time_)
+                t = URLSET_FOREACH.format(
+                    url_, file_time.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
                 link_xml = ET.fromstring(t)
                 sitemap.append(link_xml)
 
             # Write sitemap.xml
             fidx = f'{filename.stem}__{i}'
-            sitemap_time = os.path.getmtime(filename)
             sitemap_file = (filename.parent / fidx).with_suffix('.xml')
             tree.write(sitemap_file, **SITEMAP_ARGS)
-            os.utime(sitemap_file, (time.time(), sitemap_time))
+            os.utime(sitemap_file, (time.time(), file_time.timestamp()))
 
     def make_sitemap(self, files):
         tree = ET.parse('./sitemap-schema.xml')
@@ -315,7 +319,7 @@ class yourls(Yourls):
             copy2(f, fpath_)
 
             # create to link /sitemap/_sitemap.xml
-            time_ = self._get_filetime(fpath_)
+            time_ = self._get_filetime(fpath_).strftime('%Y-%m-%dT%H:%M:%SZ')
             url_ = url_join(URI_STEM, str(fpath_))
             t = SITEMAP_FOREACH.format(url_, time_)
 
@@ -329,6 +333,16 @@ class yourls(Yourls):
 
     def _get_filetime(self, fpath_):
         try:
+            path_ = fpath_.relative_to(SITEMAP)
+        except ValueError:
+            path_ = fpath_.relative_to("/build/namespaces")
+
+        try:
+            blob = (self.tree / "namespaces" / f"{path_}")
+            commit = next(self.geoconnex.iter_commits(
+                paths=blob.path, max_count=1))
+            time_ = commit.committed_datetime
+        except KeyError:
             _ = os.path.getmtime(fpath_)
             time_ = dt.fromtimestamp(_)
         except OSError:
