@@ -1,2 +1,4 @@
+click
+GitPython
 pyourls3==1.0.1
 mysql-connector

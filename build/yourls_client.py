@@ -1,8 +1,8 @@
 # =================================================================
 #
-# Authors: Benjamin Webb <benjamin.miller.webb@gmail.com>
+# Authors: Benjamin Webb <bwebb@lincolninst.edu>
 #
-# Copyright (c) 2021 Benjamin Webb
+# Copyright (c) 2023 Benjamin Webb
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -27,13 +27,14 @@
 #
 # =================================================================
 
+import click
 import os
+from pathlib import Path
 import yourls_api
-import time
-import argparse
 
 CSV = 'csv'
 XML = 'xml'
+
 
 def walk_path(path, t=CSV):
     """
@@ -48,58 +49,39 @@ def walk_path(path, t=CSV):
             if name.startswith('example'):
                 continue
             elif name.endswith(t):
-                file_list.append(os.path.join(root, name))
+                file_list.append(Path(os.path.join(root, name)))
 
     return file_list
 
-def make_parser():
-    """
-    Creates and argv parser object.
 
-    :return: ArgumentParser. with defaults if not specified.
-    """
-    parser = argparse.ArgumentParser(description='Upload csv files to yourls database')
-
-    parser.add_argument('path', type=str, nargs='+',
-                        help='path to csv files. accepts directory, url, and .csv paths')
-    parser.add_argument('-s','--uri_stem', action='store', dest='uri_stem', type=str,
-                        default='https://geoconnex.us/',
-                        help='uri stem to be removed from short url for keyword')
-    parser.add_argument('-k','--keyword', action='store', dest='keyword', type=str,
-                        default='id',
-                        help='field in CSV to be used as keyword')
-    parser.add_argument('-l','--long_url', action='store', dest='url', type=str,
-                        default='target',
-                        help='field in CSV to be used as long url')
-    parser.add_argument('-t','--title', action='store', dest='title', type=str,
-                        default='description',
-                        help='field in CSV to be used as title')
-    parser.add_argument('-a','--addr', action='store', dest='addr', type=str,
-                        default='http://localhost:8082/',
-                        help='yourls database hostname')
-    parser.add_argument('-u','--user', action='store', dest='user', type=str,
-                        default='yourls-admin',
-                        help='user for yourls database')
-    parser.add_argument('-p','--pass', action='store', dest='passwd', type=str,
-                        default='apassword',
-                        help='password for yourls database')  
-    parser.add_argument('--key', action='store', dest='key', 
-                        default=None,
-                        help='password for yourls database') 
-    return parser
-
-def main():
-    parser = make_parser()
-    kwargs = parser.parse_args()
-
-    urls = yourls_api.yourls( **vars(kwargs) )
-    time.sleep(10)
-    for p in kwargs.path:
+@click.command()
+@click.pass_context
+@click.argument('path', type=str, nargs=-1)
+@click.option('-s', '--uri_stem', type=str, default='https://geoconnex.us/',
+              help='uri stem to be removed from short url for keyword')
+@click.option('-k', '--keyword', type=str, default='id',
+              help='field in CSV to be used as keyword')
+@click.option('-l', '--long_url', type=str, default='target',
+              help='field in CSV to be used as long url')
+@click.option('-t', '--title', type=str, default='description',
+              help='field in CSV to be used as title')
+@click.option('-a', '--addr', type=str, default='http://localhost:8082/',
+              help='yourls database hostname')
+@click.option('-u', '--user', type=str, default='yourls-admin',
+              help='user for yourls database')
+@click.option('-p', '--passwd', type=str, default='apassword',
+              help='password for yourls database')
+@click.option('--to-db', type=bool, default=True,
+              help='Attempt to connect to database')
+def run(ctx, **kwargs):
+    urls = yourls_api.yourls(**kwargs)
+    for p in kwargs['path']:
         if p.endswith('.csv'):
-            urls.handle_csv( p )
+            urls.handle_csv(p)
         else:
             urls.handle_csv(walk_path(p))
-            urls.make_sitemap(walk_path(p,t=XML))
+            urls.make_sitemap(walk_path(p, t=XML))
+
 
 if __name__ == "__main__":
-    main()
+    run()
