@@ -10,40 +10,30 @@ on:
     #   - "build/namespaces/**"
 
 jobs:
-  build_sitemap:
+  sitemap_build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Generate Sitemap
+      - name: Clone geoconnex.us
         env:
-          SOURCE_REPO: geoconnex.us
-          SITEMAP_DIR: ./sitemap
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git clone -b master https://github.com/internetofwater/geoconnex.us.git ${SOURCE_REPO}
-          pip3 install git+https://github.com/cgs-earth/sitemap-generator.git
-          sitemap-generator run ${PWD}/build/namespaces
+          gh repo clone internetofwater/geoconnex.us
 
-      - name: Archive Sitemap
-        uses: actions/upload-artifact@v3
+      - name: Generate sitemap
+        uses: cgs-earth/sitemap-generator@0.2.0
         with:
-          name: sitemap
-          path: ./sitemap
+          namespace_dir: ${{ github.workspace }}/build/namespaces
 
-  build_sqldump:
+  yourls_build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Generate SQL Dump
-        uses: cgs-earth/yourls-action@0.1.0
+      - name: Generate YOURLS Database
+        uses: cgs-earth/yourls-action@0.2.0
         with:
-          filepath: ./build/namespaces
-
-      - name: Archive SQL Dump
-        uses: actions/upload-artifact@v3
-        with:
-          name: yourls
-          path: ./yourls.sql.gz
+          namespace_dir: ${{ github.workspace }}/build/namespaces
