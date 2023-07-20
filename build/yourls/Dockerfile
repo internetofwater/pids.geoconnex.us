@@ -1,5 +1,9 @@
 FROM yourls:latest
 
+ENV YOURLS_URL_CONVERT=62 \
+    YOURLS_PRIVATE_API="true" \
+    YOURLS_UNIQUE_URLS="false"
+
 COPY --chown=www-data:www-data db.php /var/www/html/user/db.php
 
 ADD plugins /var/www/html/user/plugins
