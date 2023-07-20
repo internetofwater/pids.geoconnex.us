@@ -1,102 +1,49 @@
-name: Yourls build for geoconnex.us
+name: pids.geoconnex.us build
 
 on:
-  workflow_dispatch:
+  # workflow_dispatch:
   push:
     branches:
-      # - 'dev'
-     - 'main'
-    paths:
-      - 'build/namespaces/**'
+      - "dev"
+      # - "main"
+    # paths:
+    #   - "build/namespaces/**"
 
 jobs:
-  main:
+  build_sitemap:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build MySQL and Python containers for Yourls
+      - name: Generate Sitemap
         env:
-          YOURLS_DB_USER: ${{ secrets.YOURLS_DB_USER }}
-          YOURLS_DB_PASSWORD: ${{ secrets.YOURLS_DB_PASSWORD }}
+          SOURCE_REPO: geoconnex.us
+          SITEMAP_DIR: ./sitemap
         run: |
-          docker compose up -d --build
-          docker build -t build_yourls_uploader ./build/
+          git clone -b master https://github.com/internetofwater/geoconnex.us.git ${SOURCE_REPO}
+          pip3 install git+https://github.com/cgs-earth/sitemap-generator.git
+          sitemap-generator run ${PWD}/build/namespaces
 
-      - name: Fill Yourls table with data from namespaces
-        env:
-          YOURLS_DB_USER: ${{ secrets.YOURLS_DB_USER }}
-          YOURLS_DB_PASSWORD: ${{ secrets.YOURLS_DB_PASSWORD }}
-        run: |
-          docker run --rm --network=pidsgeoconnexus_yourls_host --name build_yourls \
-            --env YOURLS_DB_PASSWORD=${YOURLS_DB_PASSWORD:-arootpassword} --env YOURLS_DB_USER=${YOURLS_DB_USER:-root} \
-            -v ./sitemap:/sitemap build_yourls_uploader
-          docker exec pidsgeoconnexus-mysql-1  sh -c "mysqldump --databases yourls -u ${YOURLS_DB_USER:-root} --password=${YOURLS_DB_PASSWORD:-arootpassword} --hex-blob --default-character-set=utf8mb4 --skip-triggers --set-gtid-purged=OFF | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
-          mkdir backup
-          cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
-          cp -R ./sitemap yourls/sitemap
-          docker compose down
-
-      - name: Zip sitemap
-        uses: vimtor/action-zip@v1
+      - name: Archive Sitemap
+        uses: actions/upload-artifact@v3
         with:
-          files: yourls/sitemap
-          dest: backup/sitemap.zip
+          name: sitemap
+          path: ./sitemap
 
-      - name: Build and push yourls-mysql
-        id: docker_build_mysql
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: |
-            internetofwater/yourls-mysql:latest
-            ghcr.io/internetofwater/yourls-mysql:latest
-          context: mysql
+  build_sqldump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Build and push yourls
-        id: docker_build_yourls
-        uses: docker/build-push-action@v2
+      - name: Generate SQL Dump
+        uses: cgs-earth/yourls-action@0.1.0
         with:
-          push: true
-          platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: |
-            internetofwater/yourls:latest
-            ghcr.io/internetofwater/yourls:latest
-          context: yourls
+          filepath: ./build/namespaces
 
-      - name: Push backup to geoconnex.us
-        uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+      - name: Archive SQL Dump
+        uses: actions/upload-artifact@v3
         with:
-          source-directory: backup
-          destination-repository-name: internetofwater/geoconnex.us
-          target-branch: master
-          target-directory: PID-server/backup
-          user-email: benjamin.miller.webb@gmail.com
-          user-name: webb-ben
+          name: yourls
+          path: ./yourls.sql.gz

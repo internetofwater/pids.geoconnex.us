@@ -1,0 +1,27 @@
+version: '3.6'
+
+services:
+    mysql:
+        image: mysql:8
+        build:
+            context: mysql
+        environment:
+            MYSQL_ROOT_USER: ${YOURLS_DB_USER:-root}
+            MYSQL_ROOT_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
+        restart: always
+
+    yourls:
+        build:
+            context: yourls
+        environment:
+            DB_SOCKET_DIR: /var
+            YOURLS_DB_HOST: /run/mysqld/mysqld.sock;host=mysql
+            YOURLS_DB_PASS: arootpassword
+            YOURLS_SITE: http://localhost:8080
+            YOURLS_USER: yourls-admin
+            YOURLS_PASS: apassword
+        restart: always
+        depends_on:
+            - mysql
+        ports:
+            - 8080:80
