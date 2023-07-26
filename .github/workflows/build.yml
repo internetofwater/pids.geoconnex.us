@@ -10,7 +10,7 @@ on:
     #   - "build/namespaces/**"
 
 jobs:
-  sitemap_build:
+  yourls-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,7 +27,66 @@ jobs:
         with:
           namespace_dir: ${{ github.workspace }}/build/namespaces
 
-  yourls_build:
+  yourls-container:
+    runs-on: ubuntu-latest
+    needs: [yourls-build]
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker YOURLS Meta
+        id: yourlsmeta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ github.repository_owner }}/yourls-mysql
+            ghcr.io/${{ github.repository_owner }}/yourls-mysql
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=test
+            type=pep440,pattern={{version}}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: sitemap
+          path: ${{ github.workspace }}/build/yourls
+
+      - name: Build and push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: ./build/yourls
+          file: ./build/yourls/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/arm64, linux/amd64
+          push: false
+          tags: ${{ steps.yourlsmeta.outputs.tags }}
+          labels: ${{ steps.yourlsmeta.outputs.labels }}
+
+  mysql-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,3 +96,62 @@ jobs:
         uses: cgs-earth/yourls-action@0.2.0
         with:
           namespace_dir: ${{ github.workspace }}/build/namespaces
+
+  mysql-container:
+    runs-on: ubuntu-latest
+    needs: [mysql-build]
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker YOURLS MySQL Meta
+        id: mysqlmeta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ github.repository_owner }}/yourls-mysql
+            ghcr.io/${{ github.repository_owner }}/yourls-mysql
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=test
+            type=pep440,pattern={{version}}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: yourls
+          path: ${{ github.workspace }}/build/mysql
+
+      - name: Build and push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: ./build/mysql
+          file: ./build/mysql/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+          push: false
+          tags: ${{ steps.mysqlmeta.outputs.tags }}
+          labels: ${{ steps.mysqlmeta.outputs.labels }}
