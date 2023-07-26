@@ -62,3 +62,73 @@ jobs:
         with:
           message: "Update cached files"
           default_author: "github_actions"
+
+  container:
+    runs-on: ubuntu-latest
+    needs: [cache-build]
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      matrix:
+        image:
+          - yourls
+          - yourls-mysql
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker YOURLS Meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ github.repository_owner }}/${{ matrix.image }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=test
+            type=pep440,pattern={{version}}
+
+      - name: Cache Yourls MySQL
+        uses: actions/download-artifact@v3
+        with:
+          name: yourls
+          path: build/yourls-mysql
+
+      - name: Cache Yourls Sitemap
+        uses: actions/download-artifact@v3
+        with:
+          name: sitemap
+          path: build/yourls
+
+      - name: Build and push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: ./build/${{ matrix.image }}
+          file: ./build/${{ matrix.image }}/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
