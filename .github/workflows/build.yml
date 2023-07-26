@@ -155,3 +155,37 @@ jobs:
           push: false
           tags: ${{ steps.mysqlmeta.outputs.tags }}
           labels: ${{ steps.mysqlmeta.outputs.labels }}
+
+  cache-build:
+    runs-on: ubuntu-latest
+    needs: [yourls-container, mysql-container]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache Yourls MySQL
+        uses: actions/download-artifact@v3
+        with:
+          name: yourls
+          path: backup
+
+      - name: Cache Yourls Sitemap
+        uses: actions/download-artifact@v3
+        with:
+          name: sitemap
+          path: backup
+
+      - name: Print backup
+        run: ls -R backup
+
+      - name: Push backup to geoconnex.us
+        uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: backup
+          destination-repository-name: internetofwater/geoconnex.us
+          target-branch: test
+          target-directory: PID-server/backup
+          user-email: benjamin.miller.webb@gmail.com
+          user-name: webb-ben
