@@ -7,7 +7,7 @@ on:
       # - "dev"
       - "main"
     paths:
-      - "build/namespaces/**"
+      - "namespaces/**"
 
 jobs:
   yourls-build:
@@ -25,7 +25,7 @@ jobs:
       - name: Generate sitemap
         uses: cgs-earth/sitemap-generator@0.2.0
         with:
-          namespace_dir: ${{ github.workspace }}/build/namespaces
+          namespace_dir: ${{ github.workspace }}/namespaces
 
   mysql-build:
     runs-on: ubuntu-latest
@@ -36,7 +36,7 @@ jobs:
       - name: Generate YOURLS Database
         uses: cgs-earth/yourls-action@0.2.0
         with:
-          namespace_dir: ${{ github.workspace }}/build/namespaces
+          namespace_dir: ${{ github.workspace }}/namespaces
 
   cache-build:
     runs-on: ubuntu-latest
