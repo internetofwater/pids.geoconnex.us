@@ -57,6 +57,10 @@ jobs:
           name: sitemap
           path: build/yourls
 
+      - name: Unzip Sitemap
+        working-directory: ./build/yourls
+        run: unzip -u sitemap
+
       - name: Commit and Push Changes
         uses: EndBug/add-and-commit@v9
         with:
@@ -119,6 +123,10 @@ jobs:
         with:
           name: sitemap
           path: build/yourls
+
+      - name: Unzip Sitemap
+        working-directory: ./build/yourls
+        run: unzip -u sitemap
 
       - name: Build and push
         uses: docker/build-push-action@v2.7.0
