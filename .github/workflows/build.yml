@@ -144,13 +144,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: yourls
-          path: backup/yourls-mysql
+          path: backup
 
       - name: Cache Yourls Sitemap
         uses: actions/download-artifact@v3
         with:
           name: sitemap
-          path: backup/yourls
+          path: backup
 
       - name: Push backup to geoconnex.us
         uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
