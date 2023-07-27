@@ -22,7 +22,10 @@ function go_regex(){
 }
 
 yourls_add_action( 'redirect_keyword_not_found', 'try_regex' );
-function try_regex( $args ) {
+yourls_add_action( 'infos_keyword_not_found', 'try_regex' );
+yourls_add_action( 'redirect_no_keyword', 'try_regex' );
+yourls_add_action( 'infos_no_keyword', 'try_regex' );
+function try_regex($args) {
     $table         = YOURLS_DB_TABLE_URL;
     $keyword       = $args[0];
     $sanitized_val = '/' . yourls_sanitize_keyword($keyword);
@@ -42,5 +45,7 @@ function try_regex( $args ) {
 
         yourls_redirect($redirect_url);
         die();
+    } else {
+
     }
 }
