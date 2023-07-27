@@ -13,7 +13,6 @@ ADD sitemap.zip /sitemap.zip
 RUN apt-get update -y && apt-get install -y unzip \
     # unzip sitemap
     && unzip /sitemap.zip -d /var/www/html/sitemap \
-    && ls -R /var/www/html/sitemap \
     && mv /var/www/html/sitemap/_sitemap.xml /var/www/html/sitemap.xml \
     # cleanup
     && apt autoremove -y  \
