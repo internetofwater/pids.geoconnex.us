@@ -6,8 +6,8 @@ on:
     branches:
       - "dev"
       - "main"
-    # paths:
-    #   - "namespaces/**"
+    paths:
+      - "namespaces/**"
 
 jobs:
   yourls-build:
@@ -110,7 +110,6 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=test
             type=pep440,pattern={{version}}
 
       - name: Cache Yourls MySQL
@@ -130,14 +129,14 @@ jobs:
         run: unzip -u sitemap -d sitemap
 
       - name: Build and push
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v4
         with:
           context: ./build/${{ matrix.image }}
           file: ./build/${{ matrix.image }}/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64
-          push: false
+          platforms: linux/amd64, linux/arm64
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
