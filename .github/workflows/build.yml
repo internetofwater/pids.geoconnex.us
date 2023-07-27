@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Generate YOURLS Database
-        uses: cgs-earth/yourls-action@0.2.0
+        uses: cgs-earth/yourls-action@0.3.0
         with:
           namespace_dir: ${{ github.workspace }}/namespaces
 
@@ -56,6 +56,10 @@ jobs:
         with:
           name: sitemap
           path: build/yourls
+
+      - name: Unzip Sitemap
+        working-directory: ./build/yourls
+        run: unzip -u sitemap -d sitemap
 
       - name: Commit and Push Changes
         uses: EndBug/add-and-commit@v9
@@ -120,14 +124,18 @@ jobs:
           name: sitemap
           path: build/yourls
 
+      - name: Unzip Sitemap
+        working-directory: ./build/yourls
+        run: unzip -u sitemap -d sitemap
+
       - name: Build and push
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v4
         with:
           context: ./build/${{ matrix.image }}
           file: ./build/${{ matrix.image }}/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64
+          platforms: linux/amd64, linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -13,17 +13,21 @@ if( !defined( 'YOURLS_ABSPATH' ) ) die();
 // Remove extension from keyword during sanitazation
 yourls_add_filter('sanitize_string', 'remove_extension');
 function remove_extension( $keyword ) {
-
     preg_match("/[.][a-zA-Z]*$/i", $keyword, $e);
-	return str_replace($e[0], '', $keyword);
-
+    if (isset($e[0])){
+      return str_replace($e[0], '', $keyword);
+    } else {
+      return $keyword;
+    }
 }
 
 // Add extension during redirect
 yourls_add_filter('redirect_location', 'extension_forward' );
 function extension_forward($long_url) {
-
     preg_match("/[.][a-zA-Z]*$/i", $_SERVER['REQUEST_URI'], $e);
-    return $long_url.$e[0];
-
+    if (isset($e[0])){
+      return $long_url.$e[0];
+    } else {
+      return $long_url;
+    }
 }
