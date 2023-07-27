@@ -1,17 +1,79 @@
-name: Yourls build for geoconnex.us
+name: pids.geoconnex.us build
 
 on:
   workflow_dispatch:
   push:
     branches:
-      # - 'dev'
-     - 'main'
+      # - "dev"
+      - "main"
     paths:
-      - 'build/namespaces/**'
+      - "build/namespaces/**"
 
 jobs:
-  main:
+  yourls-build:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clone geoconnex.us
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh repo clone internetofwater/geoconnex.us
+
+      - name: Generate sitemap
+        uses: cgs-earth/sitemap-generator@0.2.0
+        with:
+          namespace_dir: ${{ github.workspace }}/build/namespaces
+
+  mysql-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Generate YOURLS Database
+        uses: cgs-earth/yourls-action@0.2.0
+        with:
+          namespace_dir: ${{ github.workspace }}/build/namespaces
+
+  cache-build:
+    runs-on: ubuntu-latest
+    needs: [yourls-build, mysql-build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache Yourls MySQL
+        uses: actions/download-artifact@v3
+        with:
+          name: yourls
+          path: build/yourls-mysql
+
+      - name: Cache Yourls Sitemap
+        uses: actions/download-artifact@v3
+        with:
+          name: sitemap
+          path: build/yourls
+
+      - name: Commit and Push Changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update cached files"
+          default_author: "github_actions"
+
+  containers-build:
+    runs-on: ubuntu-latest
+    needs: [yourls-build, mysql-build]
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      matrix:
+        image:
+          - yourls
+          - yourls-mysql
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,59 +97,59 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build MySQL and Python containers for Yourls
-        env:
-          YOURLS_DB_USER: ${{ secrets.YOURLS_DB_USER }}
-          YOURLS_DB_PASSWORD: ${{ secrets.YOURLS_DB_PASSWORD }}
-        run: |
-          docker compose up -d --build
-          docker build -t build_yourls_uploader ./build/
-
-      - name: Fill Yourls table with data from namespaces
-        env:
-          YOURLS_DB_USER: ${{ secrets.YOURLS_DB_USER }}
-          YOURLS_DB_PASSWORD: ${{ secrets.YOURLS_DB_PASSWORD }}
-        run: |
-          docker run --rm --network=pidsgeoconnexus_yourls_host --name build_yourls \
-            --env YOURLS_DB_PASSWORD=${YOURLS_DB_PASSWORD:-arootpassword} --env YOURLS_DB_USER=${YOURLS_DB_USER:-root} \
-            -v ./sitemap:/sitemap build_yourls_uploader
-          docker exec pidsgeoconnexus-mysql-1  sh -c "mysqldump --databases yourls -u ${YOURLS_DB_USER:-root} --password=${YOURLS_DB_PASSWORD:-arootpassword} --hex-blob --default-character-set=utf8mb4 --skip-triggers --set-gtid-purged=OFF | gzip > /docker-entrypoint-initdb.d/yourls.sql.gz"
-          mkdir backup
-          cp ./mysql/yourls.sql.gz backup/yourls.sql.gz
-          cp -R ./sitemap yourls/sitemap
-          docker compose down
-
-      - name: Zip sitemap
-        uses: vimtor/action-zip@v1
+      - name: Docker YOURLS Meta
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          files: yourls/sitemap
-          dest: backup/sitemap.zip
+          images: |
+            ${{ github.repository_owner }}/${{ matrix.image }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=pep440,pattern={{version}}
 
-      - name: Build and push yourls-mysql
-        id: docker_build_mysql
-        uses: docker/build-push-action@v2
+      - name: Cache Yourls MySQL
+        uses: actions/download-artifact@v3
         with:
-          push: true
-          platforms: linux/amd64
+          name: yourls
+          path: build/yourls-mysql
+
+      - name: Cache Yourls Sitemap
+        uses: actions/download-artifact@v3
+        with:
+          name: sitemap
+          path: build/yourls
+
+      - name: Build and push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: ./build/${{ matrix.image }}
+          file: ./build/${{ matrix.image }}/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: |
-            internetofwater/yourls-mysql:latest
-            ghcr.io/internetofwater/yourls-mysql:latest
-          context: mysql
-
-      - name: Build and push yourls
-        id: docker_build_yourls
-        uses: docker/build-push-action@v2
-        with:
-          push: true
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: |
-            internetofwater/yourls:latest
-            ghcr.io/internetofwater/yourls:latest
-          context: yourls
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  cache-to-geoconnex:
+    runs-on: ubuntu-latest
+    needs: [containers-build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache Yourls MySQL
+        uses: actions/download-artifact@v3
+        with:
+          name: yourls
+          path: backup
+
+      - name: Cache Yourls Sitemap
+        uses: actions/download-artifact@v3
+        with:
+          name: sitemap
+          path: backup
 
       - name: Push backup to geoconnex.us
         uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
@@ -95,7 +157,8 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
           source-directory: backup
-          destination-repository-name: internetofwater/geoconnex.us
+          destination-github-username: internetofwater
+          destination-repository-name: geoconnex.us
           target-branch: master
           target-directory: PID-server/backup
           user-email: benjamin.miller.webb@gmail.com
