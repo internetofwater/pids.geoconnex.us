@@ -45,7 +45,5 @@ function try_regex($args) {
 
         yourls_redirect($redirect_url);
         die();
-    } else {
-
     }
 }
