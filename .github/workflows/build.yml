@@ -177,3 +177,31 @@ jobs:
           gcloud sql import sql yourls-mysql-8 gs://yourls-data/yourls.sql.gz \
             --database=yourls \
             --project=${{ secrets.GCP_PROJECT_ID }}
+
+  cache-build-ref:
+    runs-on: ubuntu-latest
+    needs: [yourls-build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache Yourls Sitemap
+        uses: actions/download-artifact@v3
+        with:
+          name: sitemap
+          path: tmp
+
+      - name: Unzip Sitemap
+        run: unzip -o tmp/sitemap -d sitemap
+
+      - name: Push backup to reference.geoconnex.us
+        uses: DevOpenWRT-Router/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: sitemap
+          destination-repository-name: internetofwater/reference.geoconnex.us
+          target-branch: main
+          target-directory: sitemap
+          user-email: benjamin.miller.webb@gmail.com
+          user-name: webb-ben
