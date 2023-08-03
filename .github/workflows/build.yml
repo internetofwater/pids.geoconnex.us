@@ -57,10 +57,6 @@ jobs:
           name: sitemap
           path: build/yourls
 
-      - name: Unzip Sitemap
-        working-directory: ./build/yourls
-        run: unzip -o sitemap -d sitemap
-
       - name: Commit and Push Changes
         uses: EndBug/add-and-commit@v9
         with:
