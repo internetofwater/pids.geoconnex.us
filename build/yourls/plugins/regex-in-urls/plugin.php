@@ -21,7 +21,7 @@ function go_regex(){
     return true;
 }
 
-yourls_add_action( 'redirect_keyword_not_found', 'try_regex' );
+yourls_add_action( 'redirect_keyword_not_found', 'try_regex', 1 );
 yourls_add_action( 'infos_keyword_not_found', 'try_regex' );
 yourls_add_action( 'redirect_no_keyword', 'try_regex' );
 yourls_add_action( 'infos_no_keyword', 'try_regex' );
