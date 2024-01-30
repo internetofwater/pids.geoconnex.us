@@ -98,3 +98,19 @@ To verify Sitemap Generator has indexed the sitemaps run the following...
 ```bash
 ls $SITEMAP_DIR/**
 ```
+
+Note: Sitemap generator uses the full when generating the sitemap index file.
+The geoconnex sitemap thus runs with namespaces at the root.
+
+```bash
+export SITEMAP_DIR=/sitemap
+cp $SRC_BASE_DIR/namespaces/* /namespaces
+sitemap-generator run /namespaces
+```
+
+Which will better reflect the live sitemap index file.
+
+```bash
+ls /sitemap/**
+cat /sitemap/_sitemap.xml
+```
