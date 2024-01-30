@@ -18,6 +18,7 @@ Please refer to the Python official documentation for comprehensive information 
 
 ```bash
 python3 --version
+pip3 --version
 ```
 
 ## Docker
@@ -36,7 +37,7 @@ Clone from your forked github repository to your *Environment* in a predefined d
 
 ```bash
 cd $SRC_BASE_DIR
-git clone git@github.com:cgs-earth/yourls-action.git
+git clone https://github.com/cgs-earth/yourls-action.git
 ```
 
 ## Runtime Dependencies
@@ -45,16 +46,15 @@ git clone git@github.com:cgs-earth/yourls-action.git
 To build the YOURLS database environment, build the MySQL docker image.
 
 ```bash
-cd $SRC_BASE_DIR/yourls-mysql
+cd $SRC_BASE_DIR/yourls-action/yourls-mysql
 docker build -t yourls-mysql .
 ```
 
 Start the MySQL database:
 ```bash
 docker run -d \
-   -p 5432:5432 \
-   --name mysql mysql \
-   -e "MYSQL_ROOT_USER=amazinguser" \
+   -p 3306:3306 \
+   --name mysql \
    -e "MYSQL_ROOT_PASSWORD=amazingpassword" \
    yourls-mysql
 ```
@@ -73,8 +73,8 @@ vi $SRC_BASE_DIR/namespaces/iow/links.csv
 Next install the python package YOURLS Action, which loads the filesystem into the MySQL database.
 
 ```bash
-cd $SRC_BASE_DIR/yourls-action
-pip3 install -e .
+cd $SRC_BASE_DIR/yourls-action/yourls-action
+python3 setup.py install
 ```
 
 Note: Ensure the location you install yourls-action is on your `$PATH`, otherwise you
@@ -82,8 +82,8 @@ won't be able to use the yourls-action CLI.
 
 YOURLS Action uses environment variables to connect to the MySQL database:
 ```bash
+export DB_SOCKET_DIR=/var
 export YOURLS_DB_HOST=localhost
-export YOURLS_DB_USER=amazinguser
 export YOURLS_DB_PASSWORD=amazingpassword
 ```
 
@@ -100,7 +100,7 @@ yourls-action run $SRC_BASE_DIR/namespaces
 To verify YOURLS action has inserted the URL mappings run the following...
 
 ```bash
-docker exec -it yourls-mysql \
+docker exec -it mysql \
    sh -c 'mysql -p -h localhost -e \
    "USE yourls; SELECT * FROM yourls_url;"'
 ```
