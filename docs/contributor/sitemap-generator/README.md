@@ -20,9 +20,6 @@ python3 --version
 pip3 --version
 ```
 
-## Docker
-Docker is used here to launch YOURLS developer runtime service dependencies YOURLS and its database (MySQL). 
-
 # Building Sitemap Generator
 
 Choose a starting location to work on your computer:
@@ -35,6 +32,7 @@ export SRC_BASE_DIR=/path/to/dev/directory
 Clone from your forked github repository to your *Environment* in a predefined directory location.
 
 ```bash
+mkdir $SRC_BSAE_DIR
 cd $SRC_BASE_DIR
 git clone https://github.com/cgs-earth/sitemap-generator.git
 ```
@@ -62,7 +60,7 @@ mkdir -p $SRC_BASE_DIR/namespaces/iow
 vi $SRC_BASE_DIR/namespaces/iow/links.csv
 # Repeat for Regex-XML if desired, Regex CSV files are ignored.
 mkdir -p $SRC_BASE_DIR/namespaces/ref
-vi $SRC_BSAE_DIR/namespaces/ref/regex-pids__0.xml
+vi $SRC_BASE_DIR/namespaces/ref/regex-pids__0.xml
 ```
 
 The structure of this filesystem will be used to generate the structure of the sitemap index filesystem.
@@ -90,7 +88,7 @@ export SITEMAP_DIR=$SRC_BASE_DIR/sitemap
 To run Sitemap Generator, use the CLI:
 
 ```bash
-yourls-action run $SRC_BASE_DIR/namespaces
+sitemap-generator run $SRC_BASE_DIR/namespaces
 ```
 
 ## Verifying Sitemap Generator Output
