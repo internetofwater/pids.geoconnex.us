@@ -11,6 +11,11 @@ git clone https://github.com/internetofwater/pids.geoconnex.us
 cd build
 ```
 
+Unzip the sitemap:
+```bash
+unzip yourls/sitemap.zip yourls/sitemap
+```
+
 If running on localhost:
 ```bash
 docker compose up

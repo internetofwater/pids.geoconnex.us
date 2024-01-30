@@ -3,9 +3,9 @@ version: '3.6'
 services:
     mysql:
         build:
-            context: mysql
+            context: yourls-mysql
+        container_name: mysql
         environment:
-            MYSQL_ROOT_USER: ${YOURLS_DB_USER:-root}
             MYSQL_ROOT_PASSWORD: ${YOURLS_DB_PASSWORD:-arootpassword}
         restart: always
 
@@ -24,3 +24,9 @@ services:
             - mysql
         ports:
             - 8080:80
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8081:8080
