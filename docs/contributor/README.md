@@ -2,7 +2,8 @@
 This document serves as a prerequisite knowledge checklist for Open Source contributors (Contributor(s)) to the Geoconnex system (System). The System is composed of multiple components which in turn leverage various Open Source software projects and their toolchains.
 
 The system works as follows:
-[pid-server](/docs/img/pid-server.png)
+
+![pid-server](/docs/img/pid-server.png)
 
 ## Topics
 For specific contributor documentation on a particular software, follow the contributor spepcific documentation:
