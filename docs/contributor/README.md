@@ -3,7 +3,9 @@ This document serves as a prerequisite knowledge checklist for Open Source contr
 
 ## Topics
 For specific contributor documentation on a particular software, follow the contributor spepcific documentation:
+- [Sitemap Generator](./sitemap-generator/)
 - [Yourls Action](./yourls-action/)
+
 
 # Prerequisite Knowledge
 
@@ -12,7 +14,7 @@ The Contributor should become proficient with the following programming language
 ## Programming Languages
 
 ### [Python](https://python.org)
-What the [Yourls Action](https://github.com/cgs-earth/yourls-action) and [Sitemap Builder](https://github.com/cgs-earth/sitemap-generator) for the Geoconnex Permanent Identifier (PID) Service are written in.
+What the [Yourls Action](https://github.com/cgs-earth/yourls-action) and [Sitemap Generator](https://github.com/cgs-earth/sitemap-generator) for the Geoconnex Permanent Identifier (PID) Service are written in.
 
 ### [PHP](https://www.php.net/)
 What the [PID Service](#pid-server) Geoconnex component is written in.
