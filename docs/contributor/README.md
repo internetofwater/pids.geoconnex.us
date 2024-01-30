@@ -8,10 +8,10 @@ The Contributor should become proficient with the following programming language
 ## Programming Languages
 
 ### [Python](https://python.org)
-What the [Build Action](#build) for the Geoconnex Permanent Identifier (PID) server is written in.
+What the [Yourls Action](https://github.com/cgs-earth/yourls-action) and [Sitemap Builder](https://github.com/cgs-earth/sitemap-generator) for the Geoconnex Permanent Identifier (PID) Service are written in.
 
 ### [PHP](https://www.php.net/)
-What the [PID Server](#pid-server) Geoconnex components are written in.
+What the [PID Service](#pid-server) Geoconnex component is written in.
 
 ### [Bash](https://www.gnu.org/software/bash/manual/bash.html)
 Used to create various scripts in the [Geoconnex component](#geoconnex-components) toolchain
@@ -19,7 +19,7 @@ Used to create various scripts in the [Geoconnex component](#geoconnex-component
 ## File Formats
 
 ### XML
-File format used to create Sitemap Indexes and Sitemaps Files crawled by Google and [Glean
+File format used to create Sitemap Indexes and Sitemaps Files crawled by Google and [Gleaner](https://github.com/gleanerio/gleaner)
 
 ### CSV
 File format used to create mappings from Geoconnex IRIs to their corresponding location on the web.
@@ -40,13 +40,10 @@ An xml document that contains URLs of Publisher specific [sitemaps](#Sitemap),
 ### [docker](https://docs.docker.com/engine/reference/commandline/cli/) 
 ### [docker compose](https://docs.docker.com/compose/)
 *See Also* [Yaml](#yaml), 
-### [make](https://www.gnu.org/software/make/manual/make.html) 
-*See Also* [Makefile](#makefile)
 
 ## Software Frameworks
 
 [Yourls](https://yourls.org/) is an open source URL shorter which the [PID Server](#pid-server) is built upon and deployed by [Aggregators](https://github.com/internetofwater/harvest.geoconnex.us/blob/main/README.md#persona-aggregator). The data pipeline created by the System which connects [Publishers](https://github.com/internetofwater/harvest.geoconnex.us/blob/main/README.md#persona-publisher) to [Aggregators](https://github.com/internetofwater/harvest.geoconnex.us/blob/main/README.md#persona-aggregator) is performed here.
-
 
 ## System Components 
 
@@ -54,16 +51,16 @@ An xml document that contains URLs of Publisher specific [sitemaps](#Sitemap),
 
 #### [PID Server](https://github.com/internetofwater/pids.geoconnex.us) 
 
-Pemanent Identifier (PID) Server is used to provide re-directs to Geoconnex webpages and provides a Sitemap index of HTML pages that [Gleaner](https://github.com/gleanerio/gleaner) ingests to geoconnex. It is implemented using cloud native services, leveraging GCP's Cloud Run and Cloud SQL.
+Pemanent Identifier (PID) Server is used to provide re-directs to Geoconnex webpages and provides a [Sitemap Index](#sitemap-index) of JSON-LD pages that [Gleaner](https://github.com/gleanerio/gleaner) ingests to geoconnex. It is implemented using cloud native services, leveraging GCP's Cloud Run and Cloud SQL.
 
 ### Dependent (Cloud) Services 
 
-See Also [Reference Services](README.md#reference-services)
+See Also [Reference Services](https://github.com/internetofwater/reference.geoconnex.us)
 
-#### Cloud Run
+#### [YOURLS](/build/yourls/) on Cloud Run
 
 Used by [YOURLS](https://yourls.org/) to serve redirects to all [Publishers](https://github.com/internetofwater/harvest.geoconnex.us/blob/main/README.md#persona-publisher). The current reference implementation used by [pids.geoconnex.us](https://pids.geoconnex.us) is YOURLS on Cloud Run to scale the number of instances as requests are recieved from [Users](https://github.com/internetofwater/harvest.geoconnex.us/blob/main/README.md#persona-user).
 
-#### Cloud MySQL Database
+#### [MySQL Database](/build/yourls-mysql/) on Cloud SQL
 
-Used by [YOURLS](https://yourls.org/) to host all 1:1 and Regex URL mappings of all data from [Publishers](README.md#persona-publisher) in geoconnex. The structure of this table is prescribed by YOURLS.
+Used by [YOURLS](https://yourls.org/) to host all 1:1 and Regex URL mappings of webpages hosted by [Publishers](README.md#persona-publisher) in geoconnex. The structure of the tables is prescribed by YOURLS.

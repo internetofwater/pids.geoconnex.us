@@ -1,0 +1,3 @@
+id, target, creator, description
+https://geoconnex.us/iow/homepage, https://internetofwater.org, bwebb@lincolninst.edu, Internet Of Water homepage
+https://geoconnex.us//usgs/monitoring-location/([a-zA-Z0-9_]+).*$, https://waterdata.usgs.gov/monitoring-location/$1, bwebb@lincolninst.edu, USGS Monitoring Locations
