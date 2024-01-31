@@ -1,6 +1,6 @@
 # Sitemap Generator Quickstart
 
-This document serves to familiarize the *Contributor* with Sitemap Generator by showing how to build and run it from source in a local build environment (*Environment*). This software builds the [Geoconnex Sitemap](https://geoconnex.us/iow/sitemap). This is used to load the [Namespaces](/namespaces/) directory crawlable index of all geoconnex.us based IRIs.
+This document serves to familiarize the *Contributor* with Sitemap Generator by showing how to build and run it from source in a local build environment (*Environment*). This software builds the [Geoconnex Sitemap](https://geoconnex.us/iow/sitemap). This is used to load the [Namespaces](/namespaces/) directory to a crawlable index of all geoconnex.us based IRIs.
 
 # Prerequisites
 
@@ -9,7 +9,7 @@ In order to build Sitemap Generator you must have the following installed in you
 ## Python
 Python can be downloaded and installed from the official [Python website](https://python.org/). Ensure you select the appropriate version for your operating system.
 
-As of the last update, the YOURLS Action requires Python 3.6 or later. Check the system's documentation or codebase for the specific version requirements.
+As of the last update, the Sitemap Generator requires Python 3.6 or later. Check the system's documentation or codebase for the specific version requirements.
 
 This documentation may refer to the ``PYTHONPATH`` environment variable, which indicates the directories where Python looks for modules. If not set, Python will use a default path.
 
@@ -29,7 +29,7 @@ export SRC_BASE_DIR=/path/to/dev/directory
 ```
 
 ## Clone
-Clone from your forked github repository to your *Environment* in a predefined directory location.
+Clone from the CGS GitHub repository to your *Environment* in a predefined directory location.
 
 ```bash
 mkdir $SRC_BSAE_DIR
@@ -41,14 +41,14 @@ git clone https://github.com/cgs-earth/sitemap-generator.git
 
 ### Set up Sitemap Generator environment:
 
-First install the python package Sitemap Genereator, which loads the filesystem into the a sitemap index hierarchy.
+First install the python package Sitemap Generator, which loads the filesystem into the a sitemap index hierarchy.
 
 ```bash
 cd $SRC_BASE_DIR/sitemap-generator
 python3 setup.py install
 ```
 
-Note: Ensure the location you install yourls-action is on your `$PATH`, otherwise you
+Note: Ensure the location you install sitemap-generator is on your `$PATH`, otherwise you
 won't be able to use the sitmap-generator CLI.
 
 ### Set up Namespace filesystem:
@@ -63,7 +63,7 @@ mkdir -p $SRC_BASE_DIR/namespaces/ref
 vi $SRC_BASE_DIR/namespaces/ref/regex-pids__0.xml
 ```
 
-The structure of this filesystem will be used to generate the structure of the sitemap index filesystem.
+The structure of this filesystem will be re-used in the structure of the sitemap index filesystem.
 
 ### Set up reference namespace:
 Sitemap Generator uses git to track when files change, This is inserted as the `<lastmod>` tag inside the sitemap.
@@ -99,12 +99,12 @@ To verify Sitemap Generator has indexed the sitemaps run the following...
 ls $SITEMAP_DIR/**
 ```
 
-Note: Sitemap generator uses the full when generating the sitemap index file.
-The geoconnex sitemap thus runs with namespaces at the root.
+Note: Sitemap generator uses the full path when generating the sitemap index file.
+The geoconnex sitemap runs with namespaces at the root of the filesystem:
 
 ```bash
 export SITEMAP_DIR=/sitemap
-cp $SRC_BASE_DIR/namespaces/* /namespaces
+cp $SRC_BASE_DIR/geoconnex.us/namespaces/* /namespaces
 sitemap-generator run /namespaces
 ```
 
