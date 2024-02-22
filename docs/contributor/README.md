@@ -13,7 +13,7 @@ For specific contributor documentation on a particular software, follow the cont
 
 # Prerequisite Knowledge
 
-The Contributor should become proficient with the following programming languages, data models, file formats, toolchains, and last but not least, the Geoconnex Components and related dependent services that comprise the System.
+The Contributor should become proficient with the following programming languages, data models, file formats, toolchains, and the Geoconnex Components and related dependent services that comprise the System.
 
 ## Programming Languages
 
@@ -24,15 +24,18 @@ What the [Yourls Action](https://github.com/cgs-earth/yourls-action) and [Sitema
 What the [PID Service](#pid-server) Geoconnex component is written in.
 
 ### [Bash](https://www.gnu.org/software/bash/manual/bash.html)
-Used to create various scripts in the [Geoconnex component](#geoconnex-components) toolchain
+Used to create various scripts in the [Geoconnex component](#geoconnex-components) toolchain.
 
 ## File Formats
 
 ### XML
-File format used to create Sitemap Indexes and Sitemaps Files crawled by Google and [Gleaner](https://github.com/gleanerio/gleaner)
+File format used to create Sitemap Indexes and Sitemaps Files crawled by Google and [Gleaner](https://github.com/gleanerio/gleaner).
 
 ### CSV
 File format used to create mappings from Geoconnex IRIs to their corresponding location on the web.
+
+### JSON-LD
+File format used to structure and represent linked data, facilitating the expression of context and relationships within the data, commonly employed for enhanced data interoperability and semantics on the web.
 
 ### [Dockerfile](https://docs.docker.com/engine/reference/builder/) 
 File format used to build Docker images. Specifies how to package all [Geoconnex components](#geoconnex-components).
@@ -41,7 +44,7 @@ File format used to build Docker images. Specifies how to package all [Geoconnex
 An xml document that contains URLs of a Publisher's http endopoints for which JSON-LD documents can be extracted and aggregated.
 
 ### [Sitemap Index](https://www.sitemaps.org/protocol.html#index)
-An xml document that contains URLs of Publisher specific [sitemaps](#Sitemap), 
+An xml document that contains URLs of Publisher specific [sitemaps](#Sitemap).
 
 ## Tool(chain)s
 
@@ -61,7 +64,7 @@ An xml document that contains URLs of Publisher specific [sitemaps](#Sitemap),
 
 #### [PID Server](https://github.com/internetofwater/pids.geoconnex.us) 
 
-Pemanent Identifier (PID) Server is used to provide re-directs to Geoconnex webpages and provides a [Sitemap Index](#sitemap-index) of JSON-LD pages that [Gleaner](https://github.com/gleanerio/gleaner) ingests to geoconnex. It is implemented using cloud native services, leveraging GCP's Cloud Run and Cloud SQL.
+Pemanent Identifier Server is used to provide re-directs to Geoconnex webpages and provides a [Sitemap Index](#sitemap-index) of JSON-LD pages that [Gleaner](https://github.com/gleanerio/gleaner) ingests to geoconnex. It is implemented using cloud native services, leveraging GCP's Cloud Run and Cloud SQL.
 
 ### Dependent (Cloud) Services 
 

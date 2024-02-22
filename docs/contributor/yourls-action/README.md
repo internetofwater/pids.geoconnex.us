@@ -2,7 +2,6 @@
 
 This document serves to familiarize the *Contributor* with YOURLS Action by showing how to build and run it from source in a local build environment (*Environment*). This software populates the YOURLS database from a filesystem of CSV mapping files. This is used to load the [Namespaces](/namespaces/) directory to a Yourls compliant, MySQL database.
 
-
 # Prerequisites
 
 In order to build YOURLS Action you must have the following installed in your *Environment*. 
@@ -78,7 +77,7 @@ python3 setup.py install
 ```
 
 Note: Ensure the location you install yourls-action is on your `$PATH`, otherwise you
-won't be able to use the yourls-action CLI.
+won't be able to use the yourls-action command line interface (CLI).
 
 YOURLS Action uses environment variables to connect to the MySQL database:
 ```bash
