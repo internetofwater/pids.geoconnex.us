@@ -18,10 +18,16 @@ Unzip the sitemap:
 unzip yourls/sitemap.zip -d yourls/sitemap
 ```
 
+### Localhost Instructions
+
 If running on localhost:
 ```bash
 docker compose up
 ```
+The service will be listening on http://localhost:8080.
+To access the admin page, visit http://localhost:8080admin.
+
+### Custom Host Instructions
 
 If running on a different host, adjust environment variables 
 in [docker-compose.yml](../build/docker-compose.yml) before running
@@ -30,10 +36,5 @@ vi docker-compose.yml
 docker compose up
 ```
 
-## Verifying 
-
-If running on localhost, the service will be listening on http://localhost:8080.
-If running on a different host, the service will be listening at 
-``YOURLS_SITE`` in [docker-compose.yml](/build/docker-compose.yml).
-
-To access the admin page, visit http://YOURLS_SITE/admin.
+If running on a different host, the service will be listening at ``YOURLS_SITE`` in [docker-compose.yml](/build/docker-compose.yml).
+To access the admin page, visit ``YOURLS_SITE/admin``.
