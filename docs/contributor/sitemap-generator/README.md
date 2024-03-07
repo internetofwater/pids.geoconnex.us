@@ -6,8 +6,8 @@ This document serves to familiarize the *Contributor* with Sitemap Generator by 
 
 In order to build Sitemap Generator you must have the following installed in your *Environment*. 
 
-## Python
-Python can be downloaded and installed from the official [Python website](https://python.org/). Ensure you select the appropriate version for your operating system.
+## Python and Pip
+Python and Pip can be downloaded and installed from the official [Python website](https://python.org/). Ensure you select the appropriate version for your operating system.
 
 As of the last update, the Sitemap Generator requires Python 3.6 or later. Check the system's documentation or codebase for the specific version requirements.
 
@@ -20,6 +20,18 @@ python3 --version
 pip3 --version
 ```
 
+## Git
+
+### Installation
+Git can be downloaded and installed from the official [Git website](https://git-scm.com/). Follow the installation instructions for your specific operating system.
+
+### Version Check
+To check the installed Git version, use the following command:
+
+```bash
+git --version
+```
+
 # Building Sitemap Generator
 
 Choose a starting location to work on your computer:
@@ -29,12 +41,12 @@ export SRC_BASE_DIR=/path/to/dev/directory
 ```
 
 ## Clone
-Clone from the CGS GitHub repository to your *Environment* in a predefined directory location.
+Clone (Sitemap Generator)[https://github.com/cgs-earth/sitemap-generator.git] from the CGS GitHub repository to your *Environment* in a predefined directory location.
 
 ```bash
-mkdir $SRC_BSAE_DIR
+mkdir $SRC_BASE_DIR
 cd $SRC_BASE_DIR
-git clone https://github.com/cgs-earth/sitemap-generator.git
+git clone git@github.com:<GH_USER>/sitemap-generator.git
 ```
 
 ## Runtime Dependencies
