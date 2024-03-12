@@ -57,7 +57,10 @@ First install the python package Sitemap Generator, which loads the filesystem i
 
 ```bash
 cd $SRC_BASE_DIR/sitemap-generator
+# if User has sudo privileges
 python3 setup.py install
+# else
+pip3 install -e .
 ```
 
 Note: Ensure the location you install sitemap-generator is on your `$PATH`, otherwise you
@@ -111,18 +114,7 @@ To verify Sitemap Generator has indexed the sitemaps run the following...
 ls $SITEMAP_DIR/**
 ```
 
-Note: Sitemap generator uses the full path when generating the sitemap index file.
-The geoconnex sitemap runs with namespaces at the root of the filesystem:
-
-```bash
-export SITEMAP_DIR=/sitemap
-cp $SRC_BASE_DIR/geoconnex.us/namespaces/* /namespaces
-sitemap-generator run /namespaces
-```
-
-Which will better reflect the live sitemap index file.
-
-```bash
-ls /sitemap/**
-cat /sitemap/_sitemap.xml
-```
+The directory structure of the sitemap should be the same as the input namespace filesystem.
+Each CSV will be represented by an XML sitemap with a maximum of 50,000 entries per file.
+Each XML will be directly copied into the sitemap filesystem.
+There will be a new XML file created called ``_sitemap.xml`` which is the Sitemap Index file.
