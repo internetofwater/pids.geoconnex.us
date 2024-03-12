@@ -134,7 +134,7 @@ docker exec -it mysql \
 
 Note: You will need to provide the MySQL password set above.
 
-The table should appear as follows:
+The table should appear as follows, with a timestamp of when the row was last updated:
 
 | keyword                                      | url                                               | title                      | timestamp           | ip      | clicks |
 |----------------------------------------------|---------------------------------------------------|----------------------------|---------------------|---------|--------|
