@@ -35,6 +35,19 @@ git --version
 ## Docker
 Docker is used here to launch YOURLS developer runtime service dependencies YOURLS and its database (MySQL). 
 
+### Installation
+Docker can be downloaded and installed from the official Docker website. Follow the installation instructions for your specific operating system.
+
+### Validation
+Once Docker is installed, you can verify that it's running correctly by executing the following command:
+
+```bash
+docker --version
+docker info
+```
+
+Note: To run docker on alpine, you must have sudo privileges.
+
 # Building YOURLS Action
 
 Choose a starting location to work on your computer:
@@ -85,7 +98,10 @@ Next install the python package YOURLS Action, which loads the directory tree in
 
 ```bash
 cd $SRC_BASE_DIR/yourls-action/yourls-action
+# if user has sudo privileges
 python3 setup.py install
+# else
+pip3 install .
 ```
 
 Note: Ensure the location you install yourls-action is on your `$PATH`, otherwise you
@@ -117,3 +133,10 @@ docker exec -it mysql \
 ```
 
 Note: You will need to provide the MySQL password set above.
+
+The table should appear as follows:
+
+| keyword                                      | url                                               | title                      | timestamp           | ip      | clicks |
+|----------------------------------------------|---------------------------------------------------|----------------------------|---------------------|---------|--------|
+| /usgs/monitoring-location/([a-zA-Z0-9_]+).*$ | https://waterdata.usgs.gov/monitoring-location/$1 | USGS Monitoring Locations | 2024-03-12 18:09:54 | 0.0.0.0 |      0 |
+| iow/homepage                                 | https://internetofwater.org                       | Internet Of Water homepage | 2024-03-12 18:09:54 | 0.0.0.0 |      0 |

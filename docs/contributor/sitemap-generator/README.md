@@ -57,7 +57,7 @@ First install the python package Sitemap Generator, which loads the directory tr
 
 ```bash
 cd $SRC_BASE_DIR/sitemap-generator
-# if User has sudo privileges
+# if user has sudo privileges
 python3 setup.py install
 # else
 pip3 install -e .
@@ -118,3 +118,16 @@ The directory structure of the sitemap should be the same as the input namespace
 Each CSV will be represented by an XML sitemap with a maximum of 50,000 entries per file.
 Each XML will be directly copied into the sitemap directory tree.
 There will be a new XML file created called ``_sitemap.xml`` which is the Sitemap Index file.
+
+The ouput should be as follows:
+
+```bash
+alpine318:/home/vagrant/sitemap# ls $SITEMAP_DIR/**
+/home/vagrant/sitemap/sitemap/_sitemap.xml
+
+/home/vagrant/sitemap/sitemap/iow:
+links__0.xml
+
+/home/vagrant/sitemap/sitemap/ref:
+regex-pids__0.xml
+```
