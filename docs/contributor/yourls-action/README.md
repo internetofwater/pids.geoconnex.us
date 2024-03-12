@@ -1,13 +1,13 @@
 # YOURLS Actions Quickstart
 
-This document serves to familiarize the *Contributor* with YOURLS Action by showing how to build and run it from source in a local build environment (*Environment*). This software populates the YOURLS database from a filesystem of CSV mapping files. This is used to load the [Namespaces](/namespaces/) directory to a Yourls compliant, MySQL database.
+This document serves to familiarize the *Contributor* with YOURLS Action by showing how to build and run it from source in a local build environment (*Environment*). This software populates the YOURLS database from a directory tree of CSV mapping files. This is used to load the [Namespaces](/namespaces/) directory to a Yourls compliant, MySQL database.
 
 # Prerequisites
 
 In order to build YOURLS Action you must have the following installed in your *Environment*. 
 
 ## Python and Pip
-Python and Pip can be downloaded and installed from the official [Python website](https://python.org/). Ensure you select the appropriate version for your operating system.
+Python and Pip can be downloaded and installed from the official [Python website](https://p.ython.org/). Ensure you select the appropriate version for your operating system.
 
 As of the last update, the YOURLS Action requires Python 3.6 or later. Check the system's documentation or codebase for the specific version requirements.
 
@@ -72,7 +72,7 @@ docker run -d \
 
 ### Create a namespace
 
-Create a namespace filesystem, and a CSV mapping file [links.csv](./links.csv).
+Create a namespace directory tree, and a CSV mapping file [links.csv](./links.csv).
 
 ```bash
 mkdir -p $SRC_BASE_DIR/namespaces/iow
@@ -81,7 +81,7 @@ vi $SRC_BASE_DIR/namespaces/iow/links.csv
 
 ### Set up YOURLS Action
 
-Next install the python package YOURLS Action, which loads the filesystem into the MySQL database.
+Next install the python package YOURLS Action, which loads the directory tree into the MySQL database.
 
 ```bash
 cd $SRC_BASE_DIR/yourls-action/yourls-action

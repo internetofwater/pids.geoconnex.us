@@ -53,7 +53,7 @@ git clone git@github.com:<GH_USER>/sitemap-generator.git
 
 ### Set up Sitemap Generator environment:
 
-First install the python package Sitemap Generator, which loads the filesystem into the a sitemap index hierarchy.
+First install the python package Sitemap Generator, which loads the directory tree into the a sitemap index hierarchy.
 
 ```bash
 cd $SRC_BASE_DIR/sitemap-generator
@@ -66,9 +66,9 @@ pip3 install -e .
 Note: Ensure the location you install sitemap-generator is on your `$PATH`, otherwise you
 won't be able to use the sitmap-generator CLI.
 
-### Set up Namespace filesystem:
+### Set up Namespace directory tree:
 This example includes both 1:1 CSV mapping files and Regex CSV mappings with their pre-generated sitemap.
-Create a namespace filesystem, and a CSV mapping file [links.csv](links.csv) and [regex-pids__0.xml](regex-pids__0.xml).
+Create a namespace directory tree, and a CSV mapping file [links.csv](links.csv) and [regex-pids__0.xml](regex-pids__0.xml).
 
 ```bash
 mkdir -p $SRC_BASE_DIR/namespaces/iow
@@ -78,7 +78,7 @@ mkdir -p $SRC_BASE_DIR/namespaces/ref
 vi $SRC_BASE_DIR/namespaces/ref/regex-pids__0.xml
 ```
 
-The structure of this filesystem will be re-used in the structure of the sitemap index filesystem.
+The structure of this directory tree will be re-used in the structure of the sitemap index directory tree.
 
 ### Set up reference namespace:
 Sitemap Generator uses git to track when files change, This is inserted as the `<lastmod>` tag inside the sitemap.
@@ -114,7 +114,7 @@ To verify Sitemap Generator has indexed the sitemaps run the following...
 ls $SITEMAP_DIR/**
 ```
 
-The directory structure of the sitemap should be the same as the input namespace filesystem.
+The directory structure of the sitemap should be the same as the input namespace directory tree.
 Each CSV will be represented by an XML sitemap with a maximum of 50,000 entries per file.
-Each XML will be directly copied into the sitemap filesystem.
+Each XML will be directly copied into the sitemap directory tree.
 There will be a new XML file created called ``_sitemap.xml`` which is the Sitemap Index file.
