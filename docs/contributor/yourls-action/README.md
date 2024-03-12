@@ -1,13 +1,13 @@
 # YOURLS Actions Quickstart
 
-This document serves to familiarize the *Contributor* with YOURLS Action by showing how to build and run it from source in a local build environment (*Environment*). This software populates the YOURLS database from a filesystem of CSV mapping files. This is used to load the [Namespaces](/namespaces/) directory to a Yourls compliant, MySQL database.
+This document serves to familiarize the *Contributor* with YOURLS Action by showing how to build and run it from source in a local build environment (*Environment*). This software populates the YOURLS database from a directory tree of CSV mapping files. This is used to load the [Namespaces](/namespaces/) directory to a Yourls compliant, MySQL database.
 
 # Prerequisites
 
 In order to build YOURLS Action you must have the following installed in your *Environment*. 
 
-## Python
-Python can be downloaded and installed from the official [Python website](https://python.org/). Ensure you select the appropriate version for your operating system.
+## Python and Pip
+Python and Pip can be downloaded and installed from the official [Python website](https://p.ython.org/). Ensure you select the appropriate version for your operating system.
 
 As of the last update, the YOURLS Action requires Python 3.6 or later. Check the system's documentation or codebase for the specific version requirements.
 
@@ -20,8 +20,33 @@ python3 --version
 pip3 --version
 ```
 
+## Git
+
+### Installation
+Git can be downloaded and installed from the official [Git website](https://git-scm.com/). Follow the installation instructions for your specific operating system.
+
+### Version Check
+To check the installed Git version, use the following command:
+
+```bash
+git --version
+```
+
 ## Docker
 Docker is used here to launch YOURLS developer runtime service dependencies YOURLS and its database (MySQL). 
+
+### Installation
+Docker can be downloaded and installed from the official Docker website. Follow the installation instructions for your specific operating system.
+
+### Validation
+Once Docker is installed, you can verify that it's running correctly by executing the following command:
+
+```bash
+docker --version
+docker info
+```
+
+Note: To run docker on alpine, you must have sudo privileges.
 
 # Building YOURLS Action
 
@@ -32,11 +57,11 @@ export SRC_BASE_DIR=/path/to/dev/directory
 ```
 
 ## Clone
-Clone from your forked github repository to your *Environment* in a predefined directory location.
+Clone (Yourls Action)[https://github.com/cgs-earth/yourls-action.git]from your forked github repository to your *Environment* in a predefined directory location.
 
 ```bash
 cd $SRC_BASE_DIR
-git clone https://github.com/cgs-earth/yourls-action.git
+git clone git@github.com:<GH_USER>/yourls-action.git
 ```
 
 ## Runtime Dependencies
@@ -60,7 +85,7 @@ docker run -d \
 
 ### Create a namespace
 
-Create a namespace filesystem, and a CSV mapping file [links.csv](./links.csv).
+Create a namespace directory tree, and a CSV mapping file [links.csv](./links.csv).
 
 ```bash
 mkdir -p $SRC_BASE_DIR/namespaces/iow
@@ -69,11 +94,14 @@ vi $SRC_BASE_DIR/namespaces/iow/links.csv
 
 ### Set up YOURLS Action
 
-Next install the python package YOURLS Action, which loads the filesystem into the MySQL database.
+Next install the python package YOURLS Action, which loads the directory tree into the MySQL database.
 
 ```bash
 cd $SRC_BASE_DIR/yourls-action/yourls-action
+# if user has sudo privileges
 python3 setup.py install
+# else
+pip3 install .
 ```
 
 Note: Ensure the location you install yourls-action is on your `$PATH`, otherwise you
@@ -105,3 +133,10 @@ docker exec -it mysql \
 ```
 
 Note: You will need to provide the MySQL password set above.
+
+The table should appear as follows, with a timestamp of when the row was last updated:
+
+| keyword                                      | url                                               | title                      | timestamp           | ip      | clicks |
+|----------------------------------------------|---------------------------------------------------|----------------------------|---------------------|---------|--------|
+| /usgs/monitoring-location/([a-zA-Z0-9_]+).*$ | https://waterdata.usgs.gov/monitoring-location/$1 | USGS Monitoring Locations | 2024-03-12 18:09:54 | 0.0.0.0 |      0 |
+| iow/homepage                                 | https://internetofwater.org                       | Internet Of Water homepage | 2024-03-12 18:09:54 | 0.0.0.0 |      0 |

@@ -6,8 +6,8 @@ This document serves to familiarize the *Contributor* with Sitemap Generator by 
 
 In order to build Sitemap Generator you must have the following installed in your *Environment*. 
 
-## Python
-Python can be downloaded and installed from the official [Python website](https://python.org/). Ensure you select the appropriate version for your operating system.
+## Python and Pip
+Python and Pip can be downloaded and installed from the official [Python website](https://python.org/). Ensure you select the appropriate version for your operating system.
 
 As of the last update, the Sitemap Generator requires Python 3.6 or later. Check the system's documentation or codebase for the specific version requirements.
 
@@ -20,6 +20,18 @@ python3 --version
 pip3 --version
 ```
 
+## Git
+
+### Installation
+Git can be downloaded and installed from the official [Git website](https://git-scm.com/). Follow the installation instructions for your specific operating system.
+
+### Version Check
+To check the installed Git version, use the following command:
+
+```bash
+git --version
+```
+
 # Building Sitemap Generator
 
 Choose a starting location to work on your computer:
@@ -29,31 +41,34 @@ export SRC_BASE_DIR=/path/to/dev/directory
 ```
 
 ## Clone
-Clone from the CGS GitHub repository to your *Environment* in a predefined directory location.
+Clone (Sitemap Generator)[https://github.com/cgs-earth/sitemap-generator.git] from the CGS GitHub repository to your *Environment* in a predefined directory location.
 
 ```bash
-mkdir $SRC_BSAE_DIR
+mkdir $SRC_BASE_DIR
 cd $SRC_BASE_DIR
-git clone https://github.com/cgs-earth/sitemap-generator.git
+git clone git@github.com:<GH_USER>/sitemap-generator.git
 ```
 
 ## Runtime Dependencies
 
 ### Set up Sitemap Generator environment:
 
-First install the python package Sitemap Generator, which loads the filesystem into the a sitemap index hierarchy.
+First install the python package Sitemap Generator, which loads the directory tree into the a sitemap index hierarchy.
 
 ```bash
 cd $SRC_BASE_DIR/sitemap-generator
+# if user has sudo privileges
 python3 setup.py install
+# else
+pip3 install -e .
 ```
 
 Note: Ensure the location you install sitemap-generator is on your `$PATH`, otherwise you
 won't be able to use the sitmap-generator CLI.
 
-### Set up Namespace filesystem:
+### Set up Namespace directory tree:
 This example includes both 1:1 CSV mapping files and Regex CSV mappings with their pre-generated sitemap.
-Create a namespace filesystem, and a CSV mapping file [links.csv](links.csv) and [regex-pids__0.xml](regex-pids__0.xml).
+Create a namespace directory tree, and a CSV mapping file [links.csv](links.csv) and [regex-pids__0.xml](regex-pids__0.xml).
 
 ```bash
 mkdir -p $SRC_BASE_DIR/namespaces/iow
@@ -63,7 +78,7 @@ mkdir -p $SRC_BASE_DIR/namespaces/ref
 vi $SRC_BASE_DIR/namespaces/ref/regex-pids__0.xml
 ```
 
-The structure of this filesystem will be re-used in the structure of the sitemap index filesystem.
+The structure of this directory tree will be re-used in the structure of the sitemap index directory tree.
 
 ### Set up reference namespace:
 Sitemap Generator uses git to track when files change, This is inserted as the `<lastmod>` tag inside the sitemap.
@@ -99,18 +114,20 @@ To verify Sitemap Generator has indexed the sitemaps run the following...
 ls $SITEMAP_DIR/**
 ```
 
-Note: Sitemap generator uses the full path when generating the sitemap index file.
-The geoconnex sitemap runs with namespaces at the root of the filesystem:
+The directory structure of the sitemap should be the same as the input namespace directory tree.
+Each CSV will be represented by an XML sitemap with a maximum of 50,000 entries per file.
+Each XML will be directly copied into the sitemap directory tree.
+There will be a new XML file created called ``_sitemap.xml`` which is the Sitemap Index file.
+
+The ouput should be as follows:
 
 ```bash
-export SITEMAP_DIR=/sitemap
-cp $SRC_BASE_DIR/geoconnex.us/namespaces/* /namespaces
-sitemap-generator run /namespaces
-```
+alpine318:/home/vagrant/sitemap# ls $SITEMAP_DIR/**
+/home/vagrant/sitemap/sitemap/_sitemap.xml
 
-Which will better reflect the live sitemap index file.
+/home/vagrant/sitemap/sitemap/iow:
+links__0.xml
 
-```bash
-ls /sitemap/**
-cat /sitemap/_sitemap.xml
+/home/vagrant/sitemap/sitemap/ref:
+regex-pids__0.xml
 ```
