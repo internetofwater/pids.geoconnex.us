@@ -6,7 +6,7 @@ The system works as follows:
 ![pid-server](/docs/img/pid-server.png)
 
 ## Topics
-For specific contributor documentation on a particular software, follow the contributor spepcific documentation:
+For specific contributor documentation on a particular software, follow the contributor specific documentation:
 - [Sitemap Generator](./sitemap-generator/)
 - [Yourls Action](./yourls-action/)
 
@@ -41,7 +41,7 @@ File format used to structure and represent linked data, facilitating the expres
 File format used to build Docker images. Specifies how to package all [Geoconnex components](#geoconnex-components).
 
 ### [Sitemap](https://www.sitemaps.org/protocol.html)
-An xml document that contains URLs of a Publisher's http endopoints for which JSON-LD documents can be extracted and aggregated.
+An xml document that contains URLs of a Publisher's http endpoints for which JSON-LD documents can be extracted and aggregated.
 
 ### [Sitemap Index](https://www.sitemaps.org/protocol.html#index)
 An xml document that contains URLs of Publisher specific [sitemaps](#Sitemap).
@@ -64,7 +64,7 @@ An xml document that contains URLs of Publisher specific [sitemaps](#Sitemap).
 
 #### [PID Server](https://github.com/internetofwater/pids.geoconnex.us) 
 
-Pemanent Identifier Server is used to provide re-directs to Geoconnex webpages and provides a [Sitemap Index](#sitemap-index) of JSON-LD pages that [Gleaner](https://github.com/gleanerio/gleaner) ingests to geoconnex. It is implemented using cloud native services, leveraging GCP's Cloud Run and Cloud SQL.
+Pemanent Identifier Server is used to provide re-directs to Geoconnex webpages and provides a [Sitemap Index](#sitemap-index) of JSON-LD pages that [Gleaner](https://github.com/gleanerio/gleaner) ingests to Geoconnex. It is implemented using cloud native services, leveraging GCP's Cloud Run and Cloud SQL.
 
 ### Dependent (Cloud) Services 
 
@@ -76,4 +76,4 @@ Used by [YOURLS](https://yourls.org/) to serve redirects to all [Publishers](htt
 
 #### [MySQL Database](/build/yourls-mysql/) on Cloud SQL
 
-Used by [YOURLS](https://yourls.org/) to host all 1:1 and Regex URL mappings of webpages hosted by [Publishers](README.md#persona-publisher) in geoconnex. The structure of the tables is prescribed by YOURLS.
+Used by [YOURLS](https://yourls.org/) to host all 1:1 and Regex URL mappings of webpages hosted by [Publishers](README.md#persona-publisher) in Geoconnex. The structure of the tables is prescribed by YOURLS.
