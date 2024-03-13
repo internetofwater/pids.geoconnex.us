@@ -57,7 +57,7 @@ export SRC_BASE_DIR=/path/to/dev/directory
 ```
 
 ## Clone
-Clone (Yourls Action)[https://github.com/cgs-earth/yourls-action.git]from your forked github repository to your *Environment* in a predefined directory location.
+Clone [Yourls Action](https://github.com/cgs-earth/yourls-action.git) from your forked github repository to your *Environment* in a predefined directory location.
 
 ```bash
 cd $SRC_BASE_DIR
