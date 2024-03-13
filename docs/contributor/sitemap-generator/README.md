@@ -41,7 +41,7 @@ export SRC_BASE_DIR=/path/to/dev/directory
 ```
 
 ## Clone
-Clone (Sitemap Generator)[https://github.com/cgs-earth/sitemap-generator.git] from the CGS GitHub repository to your *Environment* in a predefined directory location.
+Clone [Sitemap Generator](https://github.com/cgs-earth/sitemap-generator.git) from the CGS GitHub repository to your *Environment* in a predefined directory location.
 
 ```bash
 mkdir $SRC_BASE_DIR
