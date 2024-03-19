@@ -3,7 +3,7 @@ This document serves as a prerequisite knowledge checklist for Open Source contr
 
 The system works as follows:
 
-![pid-server](/docs/img/pid-server.png)
+![pid-server](/docs/assets/img/pid-server.png)
 
 ## Topics
 For specific contributor documentation on a particular software, follow the contributor specific documentation:

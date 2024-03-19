@@ -68,7 +68,7 @@ won't be able to use the sitmap-generator CLI.
 
 ### Set up Namespace directory tree:
 This example includes both 1:1 CSV mapping files and Regex CSV mappings with their pre-generated sitemap.
-Create a namespace directory tree, and a CSV mapping file [links.csv](links.csv) and [regex-pids__0.xml](regex-pids__0.xml).
+Create a namespace directory tree, and a CSV mapping file [links.csv](/docs/assets/sitemap-generator/links.csv) and [regex-pids__0.xml](/docs/assets/sitemap-generator/regex-pids__0.xml).
 
 ```bash
 mkdir -p $SRC_BASE_DIR/namespaces/iow

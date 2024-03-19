@@ -85,7 +85,7 @@ docker run -d \
 
 ### Create a namespace
 
-Create a namespace directory tree, and a CSV mapping file [links.csv](./links.csv).
+Create a namespace directory tree, and a CSV mapping file [links.csv](/docs/assets/yourls-action/links.csv).
 
 ```bash
 mkdir -p $SRC_BASE_DIR/namespaces/iow
