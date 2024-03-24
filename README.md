@@ -5,17 +5,20 @@ This repository is responsible for CI/CD of Geoconnex PIDS. The workflow of this
 
 ### Features of this Repository
 More information can be found in the README.md of each folder. As a brief overview:
-- `.github/workflows`: YAML configuration for GitHub actions.
-- `build`: Files required to build python container to load namespaces into MySQL and build sitemap.
-- `mysql`: Files required for Continuous Deployment of Yourls table in MySQL. Used to generate `internetofwater/yourls-mysql`.
-- `yourls`: Files required for the Continuous Deployment of Yourls. Used to generate `internetofwater/yourls` (Note: Sitemap is built and located in this folder during the workflow, but is hosted in the [geoconnex.us](https://github.com/internetofwater/geoconnex.us) repository and `internetofwater/yourls` Docker image)
+- [build](build/): Files required for the Continuous Deployment of Yourls and continuous deployment of Yourls table in MySQL.
+- [docs](docs/): Documentation for quickstart and contributor onboarding.
+- [namespaces](namespaces/): Geoconnex namespace directory tree
+- [workflows](.github/workflows): YAML configuration for GitHub actions.
+
 
 ### Installation
 
-1. Clone the repository to your own personal folder. <br>
-   `git clone https://github.com/internetofwater/pids.geoconnex.us`<br>
-   `cd pids.geoconnex.us`<br>
-   `docker-compose up -d --build`
+1. Clone the repository to your own personal folder and run:
+```
+   git clone https://github.com/internetofwater/pids.geoconnex.us
+   cd pids.geoconnex.us/build
+   docker-compose up -d --build
+```
 2. Open yourls admin interface and install yourls.
 3. Enable all plugins before adding any entries. 
 
