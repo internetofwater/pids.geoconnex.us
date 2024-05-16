@@ -107,6 +107,11 @@ pip3 install .
 Note: Ensure the location you install yourls-action is on your `$PATH`, otherwise you
 won't be able to use the yourls-action command line interface (CLI).
 
+```bash
+echo $PATH
+find $HOME -name yourls-action -type f
+```
+
 YOURLS Action uses environment variables to connect to the MySQL database:
 ```bash
 export DB_SOCKET_DIR=/var

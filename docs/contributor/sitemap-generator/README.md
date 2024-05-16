@@ -66,6 +66,11 @@ pip3 install -e .
 Note: Ensure the location you install sitemap-generator is on your `$PATH`, otherwise you
 won't be able to use the sitmap-generator CLI.
 
+```bash
+echo $PATH
+find $HOME -name sitemap-generator -type f
+```
+
 ### Set up Namespace directory tree:
 This example includes both 1:1 CSV mapping files and Regex CSV mappings with their pre-generated sitemap.
 Create a namespace directory tree, and a CSV mapping file [links.csv](links.csv) and [regex-pids__0.xml](regex-pids__0.xml).
