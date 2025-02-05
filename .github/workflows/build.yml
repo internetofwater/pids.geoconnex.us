@@ -23,7 +23,7 @@ jobs:
           gh repo clone internetofwater/geoconnex.us
 
       - name: Generate sitemap
-        uses: cgs-earth/sitemap-generator@0.2.0
+        uses: cgs-earth/sitemap-generator@0.2.1
         with:
           namespace_dir: ${{ github.workspace }}/namespaces
 
@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Generate YOURLS Database
-        uses: cgs-earth/yourls-action@0.3.1
+        uses: cgs-earth/yourls-action@0.3.2
         with:
           namespace_dir: ${{ github.workspace }}/namespaces
 
