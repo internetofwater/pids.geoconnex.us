@@ -1,4 +1,4 @@
 FROM internetofwater/yourls:latest
 
-ENV YOURLS_PRIVATE_API="true" \
-    YOURLS_NOSTATS="true"
+ENV YOURLS_PRIVATE_API=true \
+    YOURLS_NOSTATS=true
