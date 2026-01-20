@@ -1,4 +1,4 @@
-FROM yourls:latest
+FROM yourls:1.10.2
 
 ENV YOURLS_URL_CONVERT=62 \
     YOURLS_PRIVATE_API=false \
