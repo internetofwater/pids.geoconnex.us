@@ -10,5 +10,6 @@ ADD plugins /var/www/html/user/plugins
 ADD plugins/redirect-index/index.php /var/www/html
 
 ADD ./sitemap /var/www/html/sitemap
-COPY ./sitemap/_sitemap.xml /var/www/html/sitemap.xml
+COPY ./sitemap/sitemap.xml /var/www/html/sitemap.xml
+COPY ./sitemap.xsl /var/www/html/sitemap.xsl
 COPY ./favicon.ico /var/www/html/favicon.ico

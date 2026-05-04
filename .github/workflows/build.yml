@@ -16,12 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Clone geoconnex.us
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh repo clone internetofwater/geoconnex.us
-
       - name: Generate sitemap
         uses: cgs-earth/sitemap-generator@0.2.1
         with:
