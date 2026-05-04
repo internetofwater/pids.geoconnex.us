@@ -16,6 +16,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - uses: actions/setup-python@v5
+        name: Setup Python
+        with:
+          python-version: 3.12
+
       - name: Generate sitemap
         uses: cgs-earth/sitemap-generator@0.2.1
         with:
