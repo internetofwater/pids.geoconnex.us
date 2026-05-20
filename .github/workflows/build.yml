@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Generate YOURLS Database
-        uses: cgs-earth/yourls-action@0.3.2
+        uses: cgs-earth/yourls-action@0.3.3
         with:
           namespace_dir: ${{ github.workspace }}/namespaces
 
